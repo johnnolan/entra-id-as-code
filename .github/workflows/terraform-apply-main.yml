@@ -1,21 +1,20 @@
-name: Terraform Plan (PR)
+name: Terraform Apply (Main)
 
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths:
       - "terraform/**"
-      - ".github/workflows/terraform-plan-pr.yml"
+      - ".github/workflows/terraform-apply-main.yml"
 
 permissions:
   id-token: write
   contents: read
-  pull-requests: read
 
 jobs:
-  terraform-plan:
+  terraform-apply:
     uses: ./.github/workflows/terraform-run.yml
     secrets: inherit
     with:
-      command: plan
+      command: apply

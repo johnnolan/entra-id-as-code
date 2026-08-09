@@ -1,3 +1,4 @@
+# Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "msgraph_resource" "named_location_restricted_signin" {
   url = "identity/conditionalAccess/namedLocations"
   body = {

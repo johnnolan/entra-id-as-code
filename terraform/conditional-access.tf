@@ -8,6 +8,7 @@ variable "authentication_strength_ids" {
   }
 }
 
+# Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "msgraph_resource" "ca_1010_block_legacy_auth" {
   depends_on = [
     msgraph_resource.cap_excluded_from_conditional_access,

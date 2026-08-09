@@ -9,12 +9,20 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.0"
     }
+    msgraph = {
+      source  = "microsoft/msgraph"
+      version = "~> 0.4"
+    }
   }
 }
 
-# Authenticates via GitHub Actions OIDC when ARM_USE_OIDC=true and
-# ARM_CLIENT_ID / ARM_TENANT_ID are set as environment variables or Actions secrets.
 provider "azuread" {
+  tenant_id = var.tenant_id
+  client_id = var.client_id
+  use_oidc  = true
+}
+
+provider "msgraph" {
   tenant_id = var.tenant_id
   client_id = var.client_id
   use_oidc  = true

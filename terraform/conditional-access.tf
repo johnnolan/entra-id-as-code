@@ -8,6 +8,7 @@ variable "authentication_strength_ids" {
   }
 }
 
+# Policies pulled from https://danielchronlund.com/2020/11/26/azure-ad-conditional-access-policy-design-baseline-with-automatic-deployment-support/
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 # Note: Policies that define an `applications` condition also require `Application.Read.All`.
 resource "msgraph_resource" "ca_1010_block_legacy_auth" {

@@ -38,10 +38,15 @@ resource "msgraph_resource" "ca_1010_block_legacy_auth" {
     id = "id"
   }
 }
-/* 
+
 resource "msgraph_resource" "ca_1020_block_device_code_flow" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1020 - BLOCK - Device Code Auth Flow"
     state       = "enabled"
     conditions = {
@@ -61,15 +66,20 @@ resource "msgraph_resource" "ca_1020_block_device_code_flow" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1050_block_high_risk_countries" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1050 - BLOCK - High-Risk Countries"
     state       = "enabled"
     conditions = {
@@ -90,15 +100,20 @@ resource "msgraph_resource" "ca_1050_block_high_risk_countries" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1070_block_explicitly_blocked_apps" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1070 - BLOCK - Explicitly Blocked Cloud Apps"
     state       = "enabled"
     conditions = {
@@ -117,15 +132,20 @@ resource "msgraph_resource" "ca_1070_block_explicitly_blocked_apps" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1080_block_non_admin_sensitive_apps" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1080 - BLOCK - Non-Admin Access to Sensitive Apps"
     state       = "enabled"
     conditions = {
@@ -144,24 +164,27 @@ resource "msgraph_resource" "ca_1080_block_non_admin_sensitive_apps" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1085_block_sensitive_apps_untrusted_locations" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1085 - BLOCK - Access to Sensitive Apps from untrusted locations"
     state       = "enabled"
     conditions = {
       users = {
+        includeUsers = ["All"]
         excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id,
-          var.group_ids.pim_version1_administrators,
-          var.group_ids.pim_version1_application_developers,
-          var.group_ids.pim_admin_application_developer,
+          msgraph_resource.cap_excluded_from_conditional_access.id
         ]
       }
       applications = {
@@ -180,15 +203,20 @@ resource "msgraph_resource" "ca_1085_block_sensitive_apps_untrusted_locations" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1088_block_sensitive_apps_noncompliant_devices" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1088 - BLOCK - Access to Sensitive Apps from non-compliant devices"
     state       = "enabledForReportingButNotEnforced"
     conditions = {
@@ -205,15 +233,20 @@ resource "msgraph_resource" "ca_1088_block_sensitive_apps_noncompliant_devices" 
       operator        = "OR"
       builtInControls = ["compliantDevice"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1090_block_high_risk_signins" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1090 - BLOCK - High-Risk Sign-Ins"
     state       = "enabled"
     conditions = {
@@ -231,15 +264,20 @@ resource "msgraph_resource" "ca_1090_block_high_risk_signins" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1100_block_high_risk_users" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1100 - BLOCK - High-Risk Users"
     state       = "enabled"
     conditions = {
@@ -257,15 +295,20 @@ resource "msgraph_resource" "ca_1100_block_high_risk_users" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_1110_block_o365_insider_risk" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1110 - BLOCK - Access to Office365 apps for users with insider risk"
     state       = "enabled"
     conditions = {
@@ -290,15 +333,20 @@ resource "msgraph_resource" "ca_1110_block_o365_insider_risk" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_2010_grant_medium_risk_signins" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 2010 - GRANT - Medium-Risk Sign-Ins"
     state       = "enabled"
     conditions = {
@@ -324,15 +372,20 @@ resource "msgraph_resource" "ca_2010_grant_medium_risk_signins" {
         frequencyInterval = "everyTime"
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_2020_grant_medium_risk_users" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 2020 - GRANT - Medium-Risk Users"
     state       = "enabled"
     conditions = {
@@ -358,15 +411,20 @@ resource "msgraph_resource" "ca_2020_grant_medium_risk_users" {
         frequencyInterval = "everyTime"
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_2050_grant_mfa_all_users" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 2050 - GRANT - MFA for All Users"
     state       = "enabled"
     conditions = {
@@ -374,7 +432,6 @@ resource "msgraph_resource" "ca_2050_grant_mfa_all_users" {
         includeUsers = ["All"]
         excludeGroups = [
           msgraph_resource.cap_excluded_from_conditional_access.id,
-          var.group_ids.cap_automated_test_users,
         ]
         excludeGuestsOrExternalUsers = {
           guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
@@ -385,7 +442,6 @@ resource "msgraph_resource" "ca_2050_grant_mfa_all_users" {
       }
       applications = {
         includeApplications = ["All"]
-        excludeApplications = ["4660504c-45b3-4674-a709-71951a6b0763"]
       }
       clientAppTypes = ["all"]
     }
@@ -395,15 +451,20 @@ resource "msgraph_resource" "ca_2050_grant_mfa_all_users" {
         id = var.authentication_strength_ids.multifactor_authentication
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_2051_grant_mfa_guest_users" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 2051 - GRANT - MFA for Guest Users"
     state       = "enabled"
     conditions = {
@@ -411,7 +472,6 @@ resource "msgraph_resource" "ca_2051_grant_mfa_guest_users" {
         includeUsers = []
         excludeGroups = [
           msgraph_resource.cap_excluded_from_conditional_access.id,
-          var.group_ids.cap_automated_test_users,
         ]
         includeGuestsOrExternalUsers = {
           guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
@@ -419,7 +479,6 @@ resource "msgraph_resource" "ca_2051_grant_mfa_guest_users" {
       }
       applications = {
         includeApplications = ["All"]
-        excludeApplications = ["4660504c-45b3-4674-a709-71951a6b0763"]
       }
       clientAppTypes = ["all"]
     }
@@ -427,15 +486,20 @@ resource "msgraph_resource" "ca_2051_grant_mfa_guest_users" {
       operator        = "OR"
       builtInControls = ["mfa"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_2055_grant_phishing_resistant_mfa_admins" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 2055 - GRANT - Phishing Resistant MFA for Admins"
     state       = "enabled"
     conditions = {
@@ -454,16 +518,21 @@ resource "msgraph_resource" "ca_2055_grant_phishing_resistant_mfa_admins" {
         id = var.authentication_strength_ids.phishing_resistant_mfa
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_3020_session_guest_persistent_browser" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
-    displayName = "GLOBAL - 3020 - SESSION - Guest Users All Apps Persistant Browser"
+  body = {
+    displayName = "GLOBAL - 3020 - SESSION - Guest Users All Apps Persistent Browser"
     state       = "enabled"
     conditions = {
       users = {
@@ -489,16 +558,21 @@ resource "msgraph_resource" "ca_3020_session_guest_persistent_browser" {
         mode      = "never"
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_3025_session_guest_signin_frequency" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
-    displayName = "GLOBAL - 3025 - SESSION - Guest Users All Apps Signin Frequency"
+  body = {
+    displayName = "GLOBAL - 3025 - SESSION - Guest Users All Apps Sign-in Frequency"
     state       = "enabled"
     conditions = {
       users = {
@@ -525,16 +599,21 @@ resource "msgraph_resource" "ca_3025_session_guest_signin_frequency" {
         isEnabled = false
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
 
 resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
-    displayName = "GLOBAL - 3040 - SESSION - Continuos Access Evaluation"
+  body = {
+    displayName = "GLOBAL - 3040 - SESSION - Continuous Access Evaluation"
     state       = "enabled"
     conditions = {
       users = {
@@ -565,9 +644,8 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
         mode = "strictEnforcement"
       }
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }
 }
- */

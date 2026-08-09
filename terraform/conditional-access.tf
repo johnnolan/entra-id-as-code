@@ -9,6 +9,7 @@ variable "authentication_strength_ids" {
 }
 
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
+# Note: Policies that define an `applications` condition also require `Application.Read.All`.
 resource "msgraph_resource" "ca_1010_block_legacy_auth" {
   depends_on = [
     msgraph_resource.cap_excluded_from_conditional_access,
@@ -194,9 +195,6 @@ resource "msgraph_resource" "ca_1085_block_sensitive_apps_untrusted_locations" {
       locations = {
         includeLocations = ["All"]
         excludeLocations = [msgraph_resource.named_location_restricted_signin.id]
-      }
-      clientApplications = {
-        includeServicePrincipals = ["ServicePrincipalsInMyTenant"]
       }
     }
     grantControls = {
@@ -597,6 +595,7 @@ resource "msgraph_resource" "ca_3025_session_guest_signin_frequency" {
       }
       persistentBrowser = {
         isEnabled = false
+        mode      = "never"
       }
     }
   }
@@ -619,12 +618,6 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
       users = {
         includeUsers  = ["All"]
         excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-        includeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
-          externalTenants = {
-            membershipKind = "all"
-          }
-        }
       }
       applications = {
         includeApplications = ["All"]

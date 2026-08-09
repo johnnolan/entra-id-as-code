@@ -12,9 +12,10 @@ resource "msgraph_resource" "ca_1010_block_legacy_auth" {
   depends_on = [
     msgraph_resource.cap_excluded_from_conditional_access,
     msgraph_resource.named_location_restricted_signin,
+    msgraph_resource.security_defaults
   ]
   url = "identity/conditionalAccess/policies"
-  body = jsonencode({
+  body = {
     displayName = "GLOBAL - 1010 - BLOCK - Legacy Authentication"
     state       = "enabled"
     conditions = {
@@ -31,7 +32,7 @@ resource "msgraph_resource" "ca_1010_block_legacy_auth" {
       operator        = "OR"
       builtInControls = ["block"]
     }
-  })
+  }
   response_export_values = {
     id = "id"
   }

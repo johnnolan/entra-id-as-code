@@ -632,11 +632,6 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
       clientAppTypes = ["all"]
       locations = {
         includeLocations = ["All"]
-        excludeLocations = [
-          var.named_location_ids.ark_c_public_ips,
-          var.named_location_ids.ark_f_public_ips,
-          var.named_location_ids.sase_ips,
-        ]
       }
     }
     sessionControls = {

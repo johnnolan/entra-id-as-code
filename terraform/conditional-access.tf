@@ -9,6 +9,10 @@ variable "authentication_strength_ids" {
 }
 
 resource "msgraph_resource" "ca_1010_block_legacy_auth" {
+  depends_on = [
+    msgraph_resource.cap_excluded_from_conditional_access,
+    msgraph_resource.named_location_restricted_signin,
+  ]
   url = "identity/conditionalAccess/policies"
   body = jsonencode({
     displayName = "GLOBAL - 1010 - BLOCK - Legacy Authentication"

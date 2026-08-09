@@ -1,3 +1,4 @@
+# Microsoft Graph Application Permission: Directory.ReadWrite.All
 resource "msgraph_resource" "group_lifecycle_policy" {
   url = "groupLifecyclePolicies"
   body = {
@@ -13,6 +14,7 @@ resource "msgraph_resource" "group_lifecycle_policy" {
 # If existing group lifecycle policy is created outside Terraform, import it with:
 # terraform import msgraph_resource.group_lifecycle_policy groupLifecyclePolicies/<GROUP_LIFECYCLE_POLICY_ID>
 
+# Microsoft Graph Application Permission: GroupSettings.ReadWrite.All
 resource "msgraph_resource" "groups_settings" {
   url = "groupSettings"
   body = {
@@ -31,6 +33,7 @@ resource "msgraph_resource" "groups_settings" {
 # Import only when an existing Group.Unified setting already exists:
 # terraform import msgraph_resource.groups_settings groupSettings/<GROUPS_SETTINGS_ID>
 
+# Microsoft Graph Application Permission: Group.ReadWrite.All
 resource "msgraph_resource" "cap_excluded_from_conditional_access" {
   url = "groups"
   body = {

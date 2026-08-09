@@ -1,3 +1,4 @@
+# Microsoft Graph Application Permission: Policy.ReadWrite.AuthenticationFlows
 resource "msgraph_resource" "authentication_flow_policy" {
   url         = "policies"
   api_version = "beta"
@@ -11,6 +12,7 @@ import {
   id = "policies/authenticationFlowsPolicy?api-version=beta"
 }
 
+# Microsoft Graph Application Permission: Policy.ReadWrite.Authorization
 resource "msgraph_resource" "authorization_policy" {
   url = "policies"
   body = {
@@ -40,6 +42,7 @@ import {
   id = "policies/authorizationPolicy"
 }
 
+# Microsoft Graph Application Permission: Policy.ReadWrite.ExternalIdentities
 resource "msgraph_resource" "external_identity_policy" {
   url         = "policies"
   api_version = "beta"
@@ -54,6 +57,7 @@ import {
   id = "policies/externalIdentitiesPolicy?api-version=beta"
 }
 
+# Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "msgraph_resource" "security_defaults" {
   url         = "policies"
   api_version = "beta"
@@ -67,6 +71,7 @@ import {
   id = "policies/identitySecurityDefaultsEnforcementPolicy?api-version=beta"
 }
 
+# Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "azuread_authentication_strength_policy" "default_mfa" {
   display_name = "Default MFA"
   description  = "Baseline authentication strength policy for tenant-wide conditional access."

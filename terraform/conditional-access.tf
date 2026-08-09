@@ -2,8 +2,8 @@ variable "authentication_strength_ids" {
   description = "Map of friendly authentication strength policy name -> object ID. Built-in strengths have well-known IDs in most tenants but confirm via GET /policies/authenticationStrengthPolicies."
   type        = map(string)
   default = {
-    passwordless_mfa           = "00000000-0000-0000-0000-000000000002"
-    multifactor_authentication = "00000000-0000-0000-0000-000000000001"
+    passwordless_mfa           = "00000000-0000-0000-0000-000000000003"
+    multifactor_authentication = "00000000-0000-0000-0000-000000000002"
     phishing_resistant_mfa     = "00000000-0000-0000-0000-000000000004"
   }
 }
@@ -549,9 +549,6 @@ resource "msgraph_resource" "ca_3020_session_guest_persistent_browser" {
       clientAppTypes = ["all"]
     }
     sessionControls = {
-      signInFrequency = {
-        isEnabled = false
-      }
       persistentBrowser = {
         isEnabled = true
         mode      = "never"
@@ -630,7 +627,7 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
     }
     sessionControls = {
       continuousAccessEvaluation = {
-        mode = "strictEnforcement"
+        mode = "disabled"
       }
     }
   }

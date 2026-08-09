@@ -1,0 +1,21 @@
+name: Terraform Plan (PR)
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-plan-pr.yml"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
+
+jobs:
+  terraform-plan:
+    uses: ./.github/workflows/terraform-run.yml
+    secrets: inherit
+    with:
+      command: plan

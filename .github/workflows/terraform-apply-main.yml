@@ -1,0 +1,20 @@
+name: Terraform Apply (Main)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-apply-main.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-apply:
+    uses: ./.github/workflows/terraform-run.yml
+    secrets: inherit
+    with:
+      command: apply

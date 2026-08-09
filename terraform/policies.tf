@@ -58,7 +58,7 @@ resource "msgraph_resource" "security_defaults" {
   url         = "policies"
   api_version = "beta"
   body = {
-    isEnabled = true
+    isEnabled = false
   }
 }
 

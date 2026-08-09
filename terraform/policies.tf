@@ -71,6 +71,31 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
   display_name = "Default MFA"
   description  = "Baseline authentication strength policy for tenant-wide conditional access."
 
+  # Reference: provider-documented allowed_combinations values.
+  # Online Reference: https://raw.githubusercontent.com/hashicorp/terraform-provider-azuread/main/docs/resources/authentication_strength_policy.md
+  # You can use one or more of these strings in this list:
+  # - fido2
+  # - password
+  # - deviceBasedPush
+  # - temporaryAccessPassOneTime
+  # - federatedMultiFactor
+  # - federatedSingleFactor
+  # - hardwareOath,federatedSingleFactor
+  # - microsoftAuthenticatorPush,federatedSingleFactor
+  # - password,hardwareOath
+  # - password,microsoftAuthenticatorPush
+  # - password,sms
+  # - password,softwareOath
+  # - password,voice
+  # - sms
+  # - sms,federatedSingleFactor
+  # - softwareOath,federatedSingleFactor
+  # - temporaryAccessPassMultiUse
+  # - voice,federatedSingleFactor
+  # - windowsHelloForBusiness
+  # - x509CertificateMultiFactor
+  # - x509CertificateSingleFactor
+  # Note: some combinations may still be rejected by Graph in specific tenants.
   allowed_combinations = [
     "fido2",
     "password,microsoftAuthenticatorPush",

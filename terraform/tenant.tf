@@ -42,7 +42,8 @@ import {
 }
 
 resource "msgraph_resource" "external_identity_policy" {
-  url = "policies/externalIdentitiesPolicy"
+  url         = "policies/externalIdentitiesPolicy"
+  api_version = "beta"
   body = jsonencode({
     allowDeletedIdentitiesDataRemoval = false
     allowExternalIdentitiesToLeave    = true
@@ -51,7 +52,7 @@ resource "msgraph_resource" "external_identity_policy" {
 
 import {
   to = msgraph_resource.external_identity_policy
-  id = "policies/externalIdentitiesPolicy"
+  id = "policies/externalIdentitiesPolicy?api-version=beta"
 }
 
 resource "msgraph_resource" "security_defaults" {

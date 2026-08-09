@@ -23,6 +23,18 @@ resource "msgraph_resource" "groups_settings" {
       { name = "EnableGroupCreation", value = "false" },
       { name = "AllowGuestsToBeGroupOwner", value = "false" },
       { name = "AllowGuestsToAccessGroups", value = "false" },
+      { name = "NewUnifiedGroupWritebackDefault", value = "true" },
+      { name = "EnableMIPLabels", value = "false" },
+      { name = "CustomBlockedWordsList", value = "" },
+      { name = "EnableMSStandardBlockedWords", value = "false" },
+      { name = "ClassificationDescriptions", value = "" },
+      { name = "DefaultClassification", value = "" },
+      { name = "PrefixSuffixNamingRequirement", value = "" },
+      { name = "GuestUsageGuidelinesUrl", value = "" },
+      { name = "GroupCreationAllowedGroupId", value = "" },
+      { name = "AllowToAddGuests", value = "true" },
+      { name = "UsageGuidelinesUrl", value = "" },
+      { name = "ClassificationList", value = "" },
     ]
   }
   response_export_values = {

@@ -28,9 +28,9 @@ resource "msgraph_resource" "authorization_policy" {
       allowedToReadBitlockerKeysForOwnedDevice = false
       allowedToReadOtherUsers                  = false
       permissionGrantPoliciesAssigned = [
-        "ManagePermissionGrantsForSelf.microsoft-user-default-low",
-        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
         "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+        "ManagePermissionGrantsForSelf.microsoft-user-default-low",
       ]
     }
     guestUserRoleId = "2af84b1e-32c8-42b7-82bc-daa82404023b" # RestrictedGuest role template id

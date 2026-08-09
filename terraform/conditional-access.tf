@@ -621,10 +621,6 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
         includeApplications = ["All"]
       }
       clientAppTypes = ["all"]
-      locations = {
-        includeLocations = ["All"]
-        excludeLocations = []
-      }
     }
     sessionControls = {
       continuousAccessEvaluation = {

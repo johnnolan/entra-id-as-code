@@ -1,18 +1,19 @@
 resource "msgraph_resource" "authentication_flow_policy" {
-  url = "policies/authenticationFlowsPolicy"
-  body = jsonencode({
+  url         = "policies"
+  api_version = "beta"
+  body = {
     selfServiceSignUpEnabled = false
-  })
+  }
 }
 
 import {
   to = msgraph_resource.authentication_flow_policy
-  id = "policies/authenticationFlowsPolicy"
+  id = "policies/authenticationFlowsPolicy?api-version=beta"
 }
 
 resource "msgraph_resource" "authorization_policy" {
-  url = "policies/authorizationPolicy"
-  body = jsonencode({
+  url = "policies"
+  body = {
     allowedToSignUpEmailBasedSubscriptions    = false
     allowedToUseSSPR                          = true
     allowEmailVerifiedUsersToJoinOrganization = false
@@ -31,7 +32,7 @@ resource "msgraph_resource" "authorization_policy" {
       ]
     }
     guestUserRoleId = "2af84b1e-32c8-42b7-82bc-daa82404023b" # RestrictedGuest role template id
-  })
+  }
 }
 
 import {
@@ -40,12 +41,12 @@ import {
 }
 
 resource "msgraph_resource" "external_identity_policy" {
-  url         = "policies/externalIdentitiesPolicy"
+  url         = "policies"
   api_version = "beta"
-  body = jsonencode({
+  body = {
     allowDeletedIdentitiesDataRemoval = false
     allowExternalIdentitiesToLeave    = true
-  })
+  }
 }
 
 import {
@@ -54,27 +55,16 @@ import {
 }
 
 resource "msgraph_resource" "security_defaults" {
-  url = "policies/identitySecurityDefaultsEnforcementPolicy"
-  body = jsonencode({
+  url         = "policies"
+  api_version = "beta"
+  body = {
     isEnabled = false
-  })
+  }
 }
 
 import {
   to = msgraph_resource.security_defaults
-  id = "policies/identitySecurityDefaultsEnforcementPolicy"
-}
-
-resource "msgraph_resource" "password_rule_settings" {
-  url = "domains" # placeholder collection — see note below
-  body = jsonencode({
-    lockoutThreshold                    = 3
-    lockoutDurationInSeconds            = 120
-    bannedPasswordCheckOnPremisesMode   = "Audit"
-    enableBannedPasswordCheckOnPremises = false
-    enableBannedPasswordCheck           = true
-    bannedPasswordList                  = "six seven, yeet, no cap"
-  })
+  id = "policies/identitySecurityDefaultsEnforcementPolicy?api-version=beta"
 }
 
 resource "azuread_authentication_strength_policy" "default_mfa" {
@@ -83,9 +73,8 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
 
   allowed_combinations = [
     "fido2",
-    "microsoftAuthenticatorPush",
-    "sms",
-    "softwareOath",
-    "voice",
+    "password,microsoftAuthenticatorPush",
+    "password,softwareOath",
+    "password,sms",
   ]
 }

@@ -1,13 +1,13 @@
 data "azuread_client_config" "current" {}
 
 resource "msgraph_resource" "tenant_details" {
-  url = "organization/${data.azuread_client_config.current.tenant_id}"
-  body = jsonencode({
+  url = "organization"
+  body = {
     marketingNotificationEmails          = []
     securityComplianceNotificationMails  = []
     securityComplianceNotificationPhones = []
     technicalNotificationMails           = []
-  })
+  }
 }
 
 import {

@@ -1,6 +1,7 @@
 ---
 name: terraform-conditional-access-architect
 description: Trigger when creating, reviewing, or modifying Conditional Access Terraform in terraform/conditional-access.tf; enforce break-glass exclusions, safe rollout states, and Microsoft plus NCSC baseline controls.
+compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread provider ~> 3.0
 ---
 
 # terraform-conditional-access-architect

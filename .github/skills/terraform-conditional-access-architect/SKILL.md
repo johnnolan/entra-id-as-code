@@ -174,3 +174,6 @@ resource "msgraph_resource" "ca_0000_block_example" {
 - Confirm grants use authentication strength where stronger assurance is required.
 - Confirm location-based controls only trust approved named locations.
 - Confirm policy naming and displayName conform exactly to repository convention.
+
+* **Compliance & Test Mapping:** When auditing generated policies against official UK Government baseline standards or Maester assertions, consult:
+  `references/maester-ncsc-mapping.md`

@@ -1,6 +1,7 @@
 ---
 name: terraform-conditional-access-architect
 description: Trigger when creating, reviewing, or modifying Conditional Access Terraform in terraform/conditional-access.tf; enforce break-glass exclusions, safe rollout states, and Microsoft plus NCSC baseline controls.
+compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread provider ~> 3.0
 ---
 
 # terraform-conditional-access-architect
@@ -173,3 +174,6 @@ resource "msgraph_resource" "ca_0000_block_example" {
 - Confirm grants use authentication strength where stronger assurance is required.
 - Confirm location-based controls only trust approved named locations.
 - Confirm policy naming and displayName conform exactly to repository convention.
+
+* **Compliance & Test Mapping:** When auditing generated policies against official UK Government baseline standards or Maester assertions, consult:
+  `references/maester-ncsc-mapping.md`

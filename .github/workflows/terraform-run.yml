@@ -7,6 +7,18 @@ on:
         description: Terraform command to run after validate.
         required: true
         type: string
+      plan_detailed_exitcode:
+        description: Run terraform plan with -detailed-exitcode and expose outputs.
+        required: false
+        default: false
+        type: boolean
+    outputs:
+      plan_exit_code:
+        description: Exit code from detailed plan mode (0 no drift, 2 drift).
+        value: ${{ jobs.terraform.outputs.plan_exit_code }}
+      plan_output:
+        description: Tail of plan output from detailed plan mode.
+        value: ${{ jobs.terraform.outputs.plan_output }}
 
 permissions:
   id-token: write
@@ -16,6 +28,9 @@ jobs:
   terraform:
     name: Terraform ${{ inputs.command }}
     runs-on: ubuntu-latest
+    outputs:
+      plan_exit_code: ${{ steps.drift_plan.outputs.exit_code }}
+      plan_output: ${{ steps.drift_plan.outputs.plan_output }}
     defaults:
       run:
         shell: bash
@@ -36,6 +51,21 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
 
+      - uses: terraform-linters/setup-tflint@v6
+        name: Setup TFLint
+        with:
+          tflint_version: v0.52.0
+          cache: true
+
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint -f compact
+
       - name: Terraform Fmt Check
         run: terraform fmt -check -recursive
 
@@ -54,8 +84,32 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        if: ${{ inputs.command == 'plan' }}
+        if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == false }}
         run: terraform plan -input=false -no-color
+
+      - name: Terraform Plan (Detailed Exit Code)
+        id: drift_plan
+        if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == true }}
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -input=false -no-color > plan_output.txt 2>&1
+          plan_exit_code=$?
+          set -e
+
+          echo "exit_code=${plan_exit_code}" >> "$GITHUB_OUTPUT"
+
+          if [ "${plan_exit_code}" -eq 1 ]; then
+            echo "Terraform plan failed"
+            cat plan_output.txt
+            exit 1
+          fi
+
+          tail -n 250 plan_output.txt > plan_output_tail.txt
+          {
+            echo "plan_output<<EOF"
+            cat plan_output_tail.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Terraform Apply
         if: ${{ inputs.command == 'apply' }}

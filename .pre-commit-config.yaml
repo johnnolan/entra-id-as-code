@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: terraform-fmt-recursive
+        name: Terraform fmt (recursive)
+        entry: bash -c 'cd terraform && terraform fmt -recursive'
+        language: system
+        pass_filenames: false
+        types: [terraform]
+
+      - id: tflint-terraform
+        name: TFLint
+        entry: bash -c 'cd terraform && tflint --recursive'
+        language: system
+        pass_filenames: false
+        types: [terraform]
+
+      - id: checkov-terraform
+        name: Checkov
+        entry: bash -c 'cd terraform && checkov -d .'
+        language: system
+        pass_filenames: false
+        types: [terraform]

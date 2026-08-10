@@ -45,12 +45,20 @@ jobs:
       - name: TFLint
         run: tflint --recursive
 
-      - name: Install Checkov
-        run: |
-          python3 -m pip install --user pipx
-          python3 -m pipx ensurepath
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          "$HOME/.local/bin/pipx" install checkov
+      - uses: actions/checkout@v3
+
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+        
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        
+        if: success() || failure()
+        with:
+          sarif_file: results.sarif
 
       - name: Checkov
         run: checkov -d .

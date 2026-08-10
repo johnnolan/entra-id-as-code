@@ -36,14 +36,20 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
 
-      - name: Install TFLint
-        run: curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      - uses: terraform-linters/setup-tflint@v6
+        name: Setup TFLint
+        with:
+          tflint_version: v0.52.0
+          cache: true
 
-      - name: TFLint Init
+      - name: Show version
+        run: tflint --version
+
+      - name: Init TFLint
         run: tflint --init
 
-      - name: TFLint
-        run: tflint --recursive
+      - name: Run TFLint
+        run: tflint -f compact
 
       - uses: actions/checkout@v3
 

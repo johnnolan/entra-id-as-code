@@ -1,0 +1,112 @@
+name: Terraform Drift Detection
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  terraform-plan-drift:
+    uses: ./.github/workflows/terraform-run.yml
+    secrets: inherit
+    with:
+      command: plan
+      plan_detailed_exitcode: true
+
+  drift-issue:
+    name: Open Drift Issue
+    needs: terraform-plan-drift
+    if: ${{ needs.terraform-plan-drift.outputs.plan_exit_code == '2' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or Update Drift Issue
+        uses: actions/github-script@v7
+        env:
+          DRIFT_LABEL: terraform-drift
+          DRIFT_TITLE: Terraform drift detected
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PLAN_OUTPUT: ${{ needs.terraform-plan-drift.outputs.plan_output }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const label = process.env.DRIFT_LABEL;
+            const title = process.env.DRIFT_TITLE;
+
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: label });
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner,
+                  repo,
+                  name: label,
+                  color: 'B60205',
+                  description: 'Terraform drift detected in scheduled plan.'
+                });
+              } else {
+                throw error;
+              }
+            }
+
+            const body = [
+              `Terraform drift was detected by the scheduled workflow run: ${process.env.RUN_URL}`,
+              '',
+              'Please review and reconcile the detected changes.',
+              '',
+              '<details><summary>Plan Output (tail)</summary>',
+              '',
+              '```text',
+              process.env.PLAN_OUTPUT || 'No plan output captured.',
+              '```',
+              '',
+              '</details>'
+            ].join('\n');
+
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: label,
+              per_page: 100
+            });
+
+            const existing = openIssues.find((issue) => issue.title === title);
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              });
+            } else {
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+                labels: [label]
+              });
+            }
+
+  drift-status:
+    name: Drift Status
+    needs: terraform-plan-drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Drift Status
+        run: |
+          if [ "${{ needs.terraform-plan-drift.outputs.plan_exit_code }}" = "0" ]; then
+            echo "No drift detected."
+          elif [ "${{ needs.terraform-plan-drift.outputs.plan_exit_code }}" = "2" ]; then
+            echo "Drift detected and issue created/updated."
+          else
+            echo "Unexpected plan exit code: ${{ needs.terraform-plan-drift.outputs.plan_exit_code }}"
+            exit 1
+          fi

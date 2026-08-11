@@ -14,7 +14,6 @@ permissions:
   pull-requests: write
   issues: write
 
-
 jobs:
   terraform-plan:
     uses: ./.github/workflows/terraform-run.yml

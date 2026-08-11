@@ -87,9 +87,9 @@ jobs:
       
       - name: Terraform Plan
         run: >
-          terraform plan -input=false -no-color out=tfplan &&
-          terraform show -no-color out=tfplan > plan.txt &&
-          terraform show -json out=tfplan > plan.json
+          terraform plan -input=false -no-color -out=tfplan &&
+          terraform show -no-color tfplan > plan.txt &&
+          terraform show -json tfplan > plan.json
 
       - name: Upload Plan Artifact
         id: upload-plan

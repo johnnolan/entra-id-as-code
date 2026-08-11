@@ -99,24 +99,6 @@ jobs:
           path: '**/plan.*'
           overwrite: true
 
-      # -- If this is a PR post the changes
-      - name: Push Terraform Output to PR
-        if: github.event_name == 'pull_request' && steps.tf-plan-string.outputs.has_plans == 'true'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const body = `${process.env.SUMMARY}`;
-            github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-            });
-
-
       - name: Terraform Plan (Detailed Exit Code)
         id: drift_plan
         if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == true }}
@@ -150,7 +132,7 @@ jobs:
           files_found=$(find . -type f -name "plan*.txt")
 
           if [ -z "$files_found" ]; then
-            echo "No plan files found for . Skipping PR comment."
+            echo "No plan files found. Skipping PR comment."
 
             echo "has_plans=false" >> "$GITHUB_OUTPUT"
           else
@@ -160,8 +142,8 @@ jobs:
 
             {
               echo "summary<<${delimiter}"
-              echo "## 🌍 Terraform Plan Outputs ()"
-              echo "Below are the plan results for the  environment. Expand the sections below to see the full plan details."
+              echo "## 🌍 Terraform Plan Outputs"
+              echo "Below are the plan results. Expand the sections below to see the full plan details."
               echo ""
 
               # Find all files matching 'plan-*.txt' recursively and loop through them
@@ -200,3 +182,20 @@ jobs:
           SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
         run: |
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+      # -- If this is a PR post the changes
+      - name: Push Terraform Output to PR
+        if: github.event_name == 'pull_request' && steps.tf-plan-string.outputs.has_plans == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `${process.env.SUMMARY}`;
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+            });

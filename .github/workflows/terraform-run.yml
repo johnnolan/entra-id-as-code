@@ -23,6 +23,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  pull-requests: write
 
 jobs:
   terraform:
@@ -85,7 +86,19 @@ jobs:
 
       - name: Terraform Plan
         if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == false }}
-        run: terraform plan -input=false -no-color
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -input=false -no-color
+          plan_exit_code=$?
+          set -e
+
+          if [ "${plan_exit_code}" -eq 1 ]; then
+            exit 1
+          elif [ "${plan_exit_code}" -eq 2 ]; then
+            echo "### :warning: Terraform plan has changes" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### :white_check_mark: No Terraform changes detected" >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Terraform Plan (Detailed Exit Code)
         id: drift_plan
@@ -110,6 +123,19 @@ jobs:
             cat plan_output_tail.txt
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+
+      - name: Comment Plan on PR
+        if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == true && github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## Terraform Plan"
+            echo '```'
+            cat plan_output_tail.txt
+            echo '```'
+          } > comment_body.txt
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file comment_body.txt
 
       - name: Terraform Apply
         if: ${{ inputs.command == 'apply' }}

@@ -6,12 +6,12 @@ on:
       - main
     paths:
       - "terraform/**"
-      - ".github/workflows/terraform-plan-pr.yml"
+      - ".github/workflows/**/*.yml"
 
 permissions:
   id-token: write
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   terraform-plan:

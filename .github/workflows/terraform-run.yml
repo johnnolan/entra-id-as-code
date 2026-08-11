@@ -84,62 +84,118 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-
+      
       - name: Terraform Plan
-        if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == false }}
-        run: |
-          set +e
-          terraform plan -detailed-exitcode -input=false -no-color > plan_output_tail.txt 2>&1
-          plan_exit_code=$?
-          set -e
+        run: terraform plan -input=false -no-color out=tfplan &&
+          terraform show -no-color out=tfplan > plan.txt &&
+          terraform show -json out=tfplan > plan.json
 
-          cat plan_output_tail.txt
+      - name: Upload Plan Artifact
+        id: upload-plan
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: terraform-plan
+          path: '**/plan.*'
+          overwrite: true
 
-          if [ "${plan_exit_code}" -eq 1 ]; then
-            exit 1
-          elif [ "${plan_exit_code}" -eq 2 ]; then
-            echo "### :warning: Terraform plan has changes" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "### :white_check_mark: No Terraform changes detected" >> "$GITHUB_STEP_SUMMARY"
-          fi
+      # -- If this is a PR post the changes
+      - name: Push Terraform Output to PR
+        if: github.event_name == 'pull_request' && steps.tf-plan-string.outputs.has_plans == 'true'
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = `${process.env.SUMMARY}`;
+            github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+            });
+
 
       - name: Terraform Plan (Detailed Exit Code)
         id: drift_plan
         if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == true }}
         run: |
-          set +e
-          terraform plan -detailed-exitcode -input=false -no-color > plan_output.txt 2>&1
-          plan_exit_code=$?
-          set -e
+          # Derive drift from pre-generated plan JSON; 0 = no changes, 2 = changes
+          has_changes=$(jq '([.resource_changes[]? | select(.change.actions | . != ["no-op"] and . != ["read"])] | length) > 0' plan.json)
 
-          echo "exit_code=${plan_exit_code}" >> "$GITHUB_OUTPUT"
-
-          if [ "${plan_exit_code}" -eq 1 ]; then
-            echo "Terraform plan failed"
-            cat plan_output.txt
-            exit 1
+          if [ "${has_changes}" = "true" ]; then
+            echo "exit_code=2" >> "$GITHUB_OUTPUT"
+          else
+            echo "exit_code=0" >> "$GITHUB_OUTPUT"
           fi
 
-          tail -n 250 plan_output.txt > plan_output_tail.txt
+          tail -n 250 plan.txt > plan_output_tail.txt
           {
             echo "plan_output<<EOF"
             cat plan_output_tail.txt
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Comment Plan on PR
-        if: ${{ inputs.command == 'plan' && github.event_name == 'pull_request' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          {
-            echo "## Terraform Plan"
-            echo '```'
-            cat plan_output_tail.txt
-            echo '```'
-          } > comment_body.txt
-          gh pr comment "${{ github.event.pull_request.number }}" --body-file comment_body.txt
-
       - name: Terraform Apply
         if: ${{ inputs.command == 'apply' }}
         run: terraform apply -auto-approve -input=false -no-color
+
+      # -- Create string output of Terraform Plan
+      - name: Create String Output
+        id: tf-plan-string
+        env:
+          ARTIFACT_URL: ${{ steps.upload-plan.outputs.artifact-url }}
+        run: |
+          files_found=$(find . -type f -name "plan*.txt")
+
+          if [ -z "$files_found" ]; then
+            echo "No plan files found for . Skipping PR comment."
+
+            echo "has_plans=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_plans=true" >> "$GITHUB_OUTPUT"
+
+            delimiter="$(openssl rand -hex 8)"
+
+            {
+              echo "summary<<${delimiter}"
+              echo "## 🌍 Terraform Plan Outputs ()"
+              echo "Below are the plan results for the  environment. Expand the sections below to see the full plan details."
+              echo ""
+
+              # Find all files matching 'plan-*.txt' recursively and loop through them
+              find . -type f -name "plan*.txt" | sort | while read -r file; do
+                # Extract just the filename (e.g., "plan-LIVE.txt") to use in the header
+                filename=$(basename "$file")
+                echo "Stats for file size: $(stat -f%z "$file") bytes and line count: $(wc -l < "$file") lines."
+                echo ""
+                echo "[⬇️ Download the terraform-plan artifact](${ARTIFACT_URL})"
+                echo "<details><summary>📝 Expand Plan: <b>$filename</b></summary>"
+                echo ""
+                echo '```terraform'
+                if [ $(stat -f%z "$file") -gt 512000 ]; then
+                  echo "⚠️ Plan output is over 500kb. Download the terraform-plan to view the full plan details."
+                  tail -n 2 "$file"
+                elif [ $(wc -l < "$file") -gt 450 ]; then
+                  echo "⚠️ Plan is more than 500 lines. Download the terraform-plan to view the full plan details."
+                  tail -n 2 "$file"
+                else
+                  cat "$file"
+                fi
+                echo '```'
+                echo ""
+                echo "</details>"
+                echo ""
+              done
+
+              echo "${delimiter}"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      # -- Publish Terraform Plan as task summary
+      - name: Publish Terraform Plan to Task Summary
+        if: steps.tf-plan-string.outputs.has_plans == 'true'
+        env:
+          SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
+        run: |
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY

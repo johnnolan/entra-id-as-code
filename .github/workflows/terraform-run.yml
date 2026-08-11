@@ -89,9 +89,11 @@ jobs:
         if: ${{ inputs.command == 'plan' && inputs.plan_detailed_exitcode == false }}
         run: |
           set +e
-          terraform plan -detailed-exitcode -input=false -no-color
+          terraform plan -detailed-exitcode -input=false -no-color > plan_output_tail.txt 2>&1
           plan_exit_code=$?
           set -e
+
+          cat plan_output_tail.txt
 
           if [ "${plan_exit_code}" -eq 1 ]; then
             exit 1

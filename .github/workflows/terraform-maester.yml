@@ -29,6 +29,8 @@ jobs:
           maester_version: latest
           disable_telemetry: false
           step_summary: true
+          artifact_upload_html: true
+          pester_verbosity: Detailed
 
       - name: Write status 📃
         shell: bash

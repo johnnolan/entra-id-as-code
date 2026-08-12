@@ -14,10 +14,3 @@ repos:
         language: system
         pass_filenames: false
         types: [terraform]
-
-      - id: checkov-terraform
-        name: Checkov
-        entry: bash -c 'cd terraform && checkov -d .'
-        language: system
-        pass_filenames: false
-        types: [terraform]

@@ -1,150 +1,243 @@
 # Entra ID as Code with Terraform
 
-This repository manages Microsoft Entra ID by using Infrastructure as Code (IaC, version-controlled infrastructure definitions).  
-It uses Terraform (an infrastructure provisioning tool) with AzureAD and MSGraph (Microsoft Graph API) providers.  
-It deploys through GitHub Actions with OpenID Connect (OIDC, token-based federated authentication).
+This repository manages Microsoft Entra ID by using Terraform (an infrastructure as code tool). It uses the `azuread` provider and the `msgraph` provider to manage tenant configuration through Microsoft Graph.
 
-## Purpose
+GitHub Actions runs plan, apply, drift detection, and Maester checks. Authentication uses OpenID Connect (OIDC, token-based federated authentication) instead of long-lived client secrets.
 
-Use this repository to:
+## Use this repository to
 
-- Define Entra tenant controls in Terraform.
-- Review policy changes in pull requests.
-- Apply approved changes automatically on merge to main.
+- Define tenant controls in Terraform.
+- Review infrastructure changes in pull requests.
+- Apply approved changes on merge to `main`.
+- Detect configuration drift on a daily schedule.
+- Run Maester security tests on a daily schedule.
 
-## Architecture
+## Understand the architecture
 
-- Terraform state is stored in Azure Blob Storage (Azure object storage) through the azurerm backend.
-- GitHub Actions authenticates to Entra through federated credentials.
-- Workflows call one reusable workflow for consistent plan and apply behavior.
+- Terraform state is stored in Azure Blob Storage by using the `azurerm` backend.
+- GitHub Actions authenticates to Entra by using federated credentials.
+- The reusable workflow in `.github/workflows/terraform-run.yml` runs `tflint`, `terraform fmt`, `terraform init`, `terraform validate`, and `terraform plan` or `terraform apply`.
+- Daily drift detection reuses the same Terraform workflow and opens or updates a GitHub issue when drift exists.
+- Terraform creates a dedicated Entra application for Maester and assigns its Microsoft Graph permissions in `terraform/service-principles.tf`.
 
-## Repository Structure
+> **Security requirement**
+> Grant least-privilege Microsoft Graph application permissions to the CI application registration.
+> Grant admin consent after permission changes.
+> Scope Azure RBAC (role-based access control) for remote state as tightly as possible.
 
-- [terraform/main.tf](terraform/main.tf): Terraform backend and provider definitions.
-- [terraform/variables.tf](terraform/variables.tf): Root input variables.
-- [terraform/outputs.tf](terraform/outputs.tf): Root output values.
-- [terraform/tenant.tf](terraform/tenant.tf): Tenant organization settings.
-- [terraform/policies.tf](terraform/policies.tf): Tenant policy resources.
-- [terraform/security-groups.tf](terraform/security-groups.tf): Security groups and group settings.
-- [terraform/named-locations.tf](terraform/named-locations.tf): Conditional Access named locations.
-- [terraform/conditional-access.tf](terraform/conditional-access.tf): Conditional Access policies.
-- [terraform/security-groups.md](terraform/security-groups.md): Group settings and lifecycle policy lookup guide.
-- [.github/workflows/terraform-plan-pr.yml](.github/workflows/terraform-plan-pr.yml): Pull request plan trigger.
-- [.github/workflows/terraform-apply-main.yml](.github/workflows/terraform-apply-main.yml): Main branch apply trigger.
-- [.github/workflows/terraform-run.yml](.github/workflows/terraform-run.yml): Reusable Terraform workflow.
-- [docs/github-setup/setup-federated-credentials.md](docs/github-setup/setup-federated-credentials.md): Entra federation setup.
+## See what Terraform manages now
 
-## Managed Entra Resources
+Terraform currently manages these Entra resources:
 
-Terraform currently manages:
+- Tenant organization details in `terraform/tenant.tf`.
+- Authentication flow policy in `terraform/policies.tf`.
+- Authorization policy in `terraform/policies.tf`.
+- External identities policy in `terraform/policies.tf`.
+- Security defaults policy in `terraform/policies.tf`.
+- Authentication strength policy in `terraform/policies.tf`.
+- Named locations for Conditional Access in `terraform/named-locations.tf`.
+- Conditional Access baseline policies in `terraform/conditional-access.tf`.
+- Group lifecycle policy in `terraform/security-groups.tf`.
+- Group settings in `terraform/security-groups.tf`.
+- Conditional Access exclusion group in `terraform/security-groups.tf`.
+- A Maester application registration and federated identity credential in `terraform/service-principles.tf`.
 
-- Organization settings.
-- Authentication flow policy.
-- Authorization policy.
-- External identities policy.
-- Security defaults policy.
-- Authentication strength policy.
-- Conditional Access named locations.
-- Conditional Access policies.
-- Group lifecycle policy.
-- Group settings.
-- Conditional Access exclusion group.
+Some tenant objects are singletons. Terraform uses import blocks for some singleton resources so it can adopt existing tenant objects safely.
 
-Some resources are tenant singletons. Terraform import blocks adopt existing singleton objects.
+## Note the placeholder modules
 
-## Required GitHub Secrets
+These Terraform files exist but are still placeholders:
 
-Set these repository or environment secrets:
+- `terraform/access-packages.tf`
+- `terraform/authentication-method-policies.tf`
+- `terraform/cross-tenant-access.tf`
 
-- ARM_CLIENT_ID: Entra app registration client ID.
-- ARM_TENANT_ID: Entra tenant ID.
-- ARM_SUBSCRIPTION_ID: Azure subscription ID for state backend access.
-- TFSTATE_RESOURCE_GROUP_NAME: Resource group hosting the state storage account.
-- TFSTATE_STORAGE_ACCOUNT_NAME: Storage account that holds Terraform state.
-- TFSTATE_CONTAINER_NAME: Blob container for Terraform state.
-- TFSTATE_KEY: Blob name for the state file.
+Each file currently contains `# TODO` only.
 
-## Required Microsoft Graph App Permissions
+## Review the repository structure
 
-Grant these Microsoft Graph application permissions to the CI app registration:
+- `terraform/main.tf`: Terraform version, backend, and provider definitions.
+- `terraform/variables.tf`: Root input variables for `tenant_id` and `client_id`.
+- `terraform/outputs.tf`: Output file. It is currently empty.
+- `terraform/tenant.tf`: Tenant organization resource definitions.
+- `terraform/policies.tf`: Core policy resources.
+- `terraform/named-locations.tf`: Named location resources for Conditional Access.
+- `terraform/conditional-access.tf`: Conditional Access baseline policies.
+- `terraform/security-groups.tf`: Group lifecycle, group settings, and exclusion group resources.
+- `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
+- `terraform/service-principles.tf`: Maester application registration and federated credential.
+- `docs/github-setup/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+- `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger.
+- `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger.
+- `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow.
+- `.github/workflows/terraform-maester.yml`: Scheduled Maester test workflow.
+- `.github/workflows/terraform-run.yml`: Reusable Terraform workflow.
 
-- Policy.Read.All
-- Policy.ReadWrite.ConditionalAccess
-- Policy.ReadWrite.AuthenticationFlows
-- Policy.ReadWrite.Authorization
-- Policy.ReadWrite.ExternalIdentities
-- Organization.ReadWrite.All
-- Group.ReadWrite.All
-- GroupSettings.ReadWrite.All
-- Directory.ReadWrite.All
-- Application.Read.All
+## Understand the workflows
 
-Grant admin consent after you add or update permissions.
+### Pull request plan
 
-## Skills
+Workflow: `.github/workflows/terraform-plan-pr.yml`
 
-This repository includes Copilot skills (task-focused instruction files) under [.github/skills](.github/skills).
+- Trigger: pull request to `main`.
+- Path filter: `terraform/**` and `.github/workflows/**/*.yml`.
+- Behavior: runs the reusable Terraform workflow with `command: plan`.
+- Output: uploads plan artifacts, writes a workflow summary, and posts a pull request comment with the plan summary.
 
-Use these skills to speed up documentation, permission reviews, and troubleshooting:
+### Main branch apply
 
-- [gds-tech-writer](.github/skills/gds-tech-writer/SKILL.md): Improves technical documentation structure and readability while preserving technical terminology.
-- [terraform-main-permissions](.github/skills/terraform-main-permissions/SKILL.md): Explains permission context for [terraform/main.tf](terraform/main.tf).
-- [terraform-variables-permissions](.github/skills/terraform-variables-permissions/SKILL.md): Explains permission context for [terraform/variables.tf](terraform/variables.tf).
-- [terraform-outputs-permissions](.github/skills/terraform-outputs-permissions/SKILL.md): Explains permission context for [terraform/outputs.tf](terraform/outputs.tf).
-- [terraform-tenant-permissions](.github/skills/terraform-tenant-permissions/SKILL.md): Lists Graph permissions for [terraform/tenant.tf](terraform/tenant.tf).
-- [terraform-policies-permissions](.github/skills/terraform-policies-permissions/SKILL.md): Lists Graph permissions for [terraform/policies.tf](terraform/policies.tf).
-- [terraform-security-groups-permissions](.github/skills/terraform-security-groups-permissions/SKILL.md): Lists Graph permissions for [terraform/security-groups.tf](terraform/security-groups.tf).
-- [terraform-named-locations-permissions](.github/skills/terraform-named-locations-permissions/SKILL.md): Lists Graph permissions for [terraform/named-locations.tf](terraform/named-locations.tf).
-- [terraform-conditional-access-permissions](.github/skills/terraform-conditional-access-permissions/SKILL.md): Lists Graph permissions for [terraform/conditional-access.tf](terraform/conditional-access.tf).
+Workflow: `.github/workflows/terraform-apply-main.yml`
 
-### How To Use Skills
+- Trigger: push to `main`.
+- Path filter: `terraform/**` and `.github/workflows/**/*.yml`.
+- Behavior: runs the reusable Terraform workflow with `command: apply`.
 
-Use these prompt patterns in Copilot Chat:
+### Daily drift detection
 
-1. "Use gds-tech-writer to rewrite [README.md](README.md) for scannability and clarity."
-2. "Use terraform-conditional-access-permissions to verify permissions before I run apply."
-3. "Use terraform-security-groups-permissions to explain why GroupSettings calls fail with AccessDenied."
-4. "Use terraform-policies-permissions to build a least-privilege Graph permission checklist."
+Workflow: `.github/workflows/terraform-drift-daily.yml`
 
-For each Terraform file change, run the related permission skill before merging to main.
+- Trigger: daily at `0 6 * * *` and `workflow_dispatch`.
+- Behavior: runs Terraform plan in detailed exit code mode.
+- Drift handling: opens or updates a GitHub issue with the `terraform-drift` label when drift exists.
 
-## CI/CD Workflow Behavior
+### Daily Maester tests
 
-Plan workflow:
+Workflow: `.github/workflows/terraform-maester.yml`
 
-1. Trigger: pull request to main.
-2. Steps: fmt, init, validate, and plan.
-3. Outcome: validates code and previews changes.
+- Trigger: daily at `15 6 * * *` and `workflow_dispatch`.
+- Behavior: runs `maester365/maester-action` against the tenant.
+- Output: writes test counts and uploads the Maester HTML artifact through the action.
 
-Apply workflow:
+## Configure required GitHub secrets
 
-1. Trigger: push to main.
-2. Steps: fmt, init, validate, and apply.
-3. Outcome: applies approved changes.
+Set these GitHub Actions secrets:
 
-## Local Development
+- `ARM_CLIENT_ID`: Entra application client ID.
+- `ARM_TENANT_ID`: Entra tenant ID.
+- `ARM_SUBSCRIPTION_ID`: Azure subscription ID for backend access.
+- `TFSTATE_RESOURCE_GROUP_NAME`: Resource group that hosts the Terraform state storage account.
+- `TFSTATE_STORAGE_ACCOUNT_NAME`: Storage account that stores Terraform state.
+- `TFSTATE_CONTAINER_NAME`: Blob container for Terraform state.
+- `TFSTATE_KEY`: Blob name for the Terraform state file.
 
-From repository root:
+## Grant Microsoft Graph permissions for Terraform CI
 
-1. `cd terraform`
-2. `terraform init -input=false`
-3. `terraform validate`
-4. `terraform plan -input=false -no-color`
+The exact permission set depends on the Terraform resources you manage. For this repository, the current implementation covers policies, groups, directory objects, organization settings, and application-aware Conditional Access conditions.
 
-For local runs, sign in with Azure CLI or use a service principal.
+Use the repository skill files in `.github/skills` to verify the exact permission set before you run `apply`.
 
-## Troubleshooting
+Common Microsoft Graph application permissions for the current Terraform implementation include:
 
-Use these checks for common Microsoft Graph errors:
+- `Policy.Read.All`
+- `Policy.ReadWrite.ConditionalAccess`
+- `Policy.ReadWrite.AuthenticationFlows`
+- `Policy.ReadWrite.Authorization`
+- `Policy.ReadWrite.ExternalIdentities`
+- `Policy.ReadWrite.SecurityDefaults`
+- `Directory.ReadWrite.All`
+- `Group.ReadWrite.All`
+- `GroupSettings.ReadWrite.All`
+- `Organization.ReadWrite.All`
+- `Application.Read.All`
 
-- 403 AccessDenied with application conditions: add `Application.Read.All` and grant admin consent.
-- Invalid authentication strength ID: use built-in IDs from Graph or query `/policies/authenticationStrengthPolicies`.
-- Conditional Access policy validation errors: verify allowed condition combinations for each control type.
-- Group settings and lifecycle imports: follow [terraform/security-groups.md](terraform/security-groups.md).
+> **Warning**
+> Conditional Access policies that use an `applications` condition require `Application.Read.All`.
+> Review the file-specific permission skill before you merge changes.
 
-## Security and Governance
+## Understand the Maester application permissions
 
-- Grant least-privilege Graph permissions to the CI app registration.
-- Protect main with branch protection and required status checks.
-- Restrict state storage access by using RBAC (role-based access control).
-- Follow [SECURITY.md](SECURITY.md) for vulnerability reporting.
+Terraform creates the Maester application registration in `terraform/service-principles.tf`. That application requests these Microsoft Graph permissions today:
+
+- `User.Read.All`
+- `AuditLog.Read.All`
+- `DeviceManagementConfiguration.Read.All`
+- `DeviceManagementManagedDevices.Read.All`
+- `DeviceManagementRBAC.Read.All`
+- `DeviceManagementServiceConfig.Read.All`
+- `Directory.Read.All`
+- `DirectoryRecommendations.Read.All`
+- `EntitlementManagement.Read.All`
+- `IdentityRiskEvent.Read.All`
+- `NetworkAccess.Read.All`
+- `OnPremDirectorySynchronization.Read.All`
+- `OrgSettings-AppsAndServices.Read.All`
+- `OrgSettings-Forms.Read.All`
+- `Policy.Read.All`
+- `Policy.Read.ConditionalAccess`
+- `Reports.Read.All`
+- `ReportSettings.Read.All`
+- `RoleEligibilitySchedule.Read.Directory`
+- `RoleManagement.Read.All`
+- `RoleManagementAlert.Read.Directory`
+- `SecurityIdentitiesHealth.Read.All`
+- `SecurityIdentitiesSensors.Read.All`
+- `ThreatHunting.Read.All`
+- `UserAuthenticationMethod.Read.All`
+- `User.ReadWrite` (delegated scope)
+
+Grant admin consent after you create or update these permissions.
+
+## Use the included Copilot skills
+
+This repository includes task-focused Copilot skills in `.github/skills`.
+
+Available skills:
+
+- `gds-tech-writer`: Rewrite or review technical documentation.
+- `terraform-conditional-access-architect`: Review or modify `terraform/conditional-access.tf` with baseline and rollout guardrails.
+- `terraform-main-permissions`: Explain permission context for `terraform/main.tf`.
+- `terraform-named-locations-permissions`: Explain permission context for `terraform/named-locations.tf`.
+- `terraform-outputs-permissions`: Explain permission context for `terraform/outputs.tf`.
+- `terraform-policies-permissions`: Explain permission context for `terraform/policies.tf`.
+- `terraform-security-groups-permissions`: Explain permission context for `terraform/security-groups.tf`.
+- `terraform-tenant-permissions`: Explain permission context for `terraform/tenant.tf`.
+- `terraform-variables-permissions`: Explain permission context for `terraform/variables.tf`.
+
+Files without a dedicated skill yet include:
+
+- `terraform/access-packages.tf`
+- `terraform/authentication-method-policies.tf`
+- `terraform/cross-tenant-access.tf`
+- `terraform/service-principles.tf`
+
+## Run Terraform locally
+
+Use the same tenant and backend values that the workflows use.
+
+1. Change to the Terraform directory.
+2. Run `terraform init` with the backend configuration values.
+3. Run `terraform validate`.
+4. Run `terraform plan`.
+
+Example:
+
+```bash
+cd terraform
+terraform init -input=false \
+  -backend-config="resource_group_name=<TFSTATE_RESOURCE_GROUP_NAME>" \
+  -backend-config="storage_account_name=<TFSTATE_STORAGE_ACCOUNT_NAME>" \
+  -backend-config="container_name=<TFSTATE_CONTAINER_NAME>" \
+  -backend-config="key=<TFSTATE_KEY>" \
+  -backend-config="tenant_id=<ARM_TENANT_ID>" \
+  -backend-config="client_id=<ARM_CLIENT_ID>" \
+  -backend-config="subscription_id=<ARM_SUBSCRIPTION_ID>"
+terraform validate
+terraform plan -input=false -no-color
+```
+
+If you use Azure CLI locally, ensure you can get a Microsoft Graph token before you run import or discovery commands.
+
+## Troubleshoot common issues
+
+- `403 AccessDenied` on Conditional Access resources: add `Application.Read.All` and grant admin consent.
+- Invalid authentication strength ID: confirm the built-in IDs or query `/policies/authenticationStrengthPolicies`.
+- Group settings or lifecycle import issues: follow `terraform/security-groups.md`.
+- OIDC federation failures: follow `docs/github-setup/setup-federated-credentials.md` and verify issuer, audience, and subject values.
+- Drift issue noise: review the scheduled plan output in the workflow run and the `terraform-drift` issue comments.
+
+## Protect the repository
+
+- Protect `main` with required status checks.
+- Restrict who can approve and merge infrastructure changes.
+- Scope backend storage access by RBAC.
+- Follow `SECURITY.md` for vulnerability reporting.

@@ -146,8 +146,8 @@ resource "azuread_application" "maester" {
   }
 
   web {
-    homepage_url  = ""
-    logout_url    = ""
+    homepage_url  = "https://github.com/johnnolan/entra-id-as-code"
+    logout_url    = "https://empty-redirect-uri"
     redirect_uris = []
 
     implicit_grant {

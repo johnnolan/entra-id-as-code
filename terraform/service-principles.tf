@@ -3,7 +3,7 @@
 #region Measter
 resource "azuread_application" "maester" {
   display_name     = "Maester"
-  logo_image       = filebase64("/assets/maester.png")
+  logo_image       = filebase64("assets/maester.png")
   sign_in_audience = "AzureADMyOrg"
 
   feature_tags {

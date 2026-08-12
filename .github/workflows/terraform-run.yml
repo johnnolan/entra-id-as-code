@@ -129,6 +129,7 @@ jobs:
         env:
           ARTIFACT_URL: ${{ steps.upload-plan.outputs.artifact-url }}
         run: |
+          summary_file="${RUNNER_TEMP}/terraform-plan-summary.md"
           files_found=$(find . -type f -name "plan*.txt")
 
           if [ -z "$files_found" ]; then
@@ -137,11 +138,9 @@ jobs:
             echo "has_plans=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_plans=true" >> "$GITHUB_OUTPUT"
-
-            delimiter="$(openssl rand -hex 8)"
+            echo "summary_file=${summary_file}" >> "$GITHUB_OUTPUT"
 
             {
-              echo "summary<<${delimiter}"
               echo "## 🌍 Terraform Plan Outputs"
               echo "Below are the plan results. Expand the sections below to see the full plan details."
               echo ""
@@ -150,16 +149,18 @@ jobs:
               find . -type f -name "plan*.txt" | sort | while read -r file; do
                 # Extract just the filename (e.g., "plan-LIVE.txt") to use in the header
                 filename=$(basename "$file")
-                echo "Stats for file size: $(stat -f%z "$file") bytes and line count: $(wc -l < "$file") lines."
+                file_size=$(stat -c%s "$file")
+                line_count=$(wc -l < "$file")
+                echo "Stats for file size: ${file_size} bytes and line count: ${line_count} lines."
                 echo ""
                 echo "[⬇️ Download the terraform-plan artifact](${ARTIFACT_URL})"
                 echo "<details><summary>📝 Expand Plan: <b>$filename</b></summary>"
                 echo ""
                 echo '```terraform'
-                if [ $(stat -f%z "$file") -gt 512000 ]; then
+                if [ "${file_size}" -gt 512000 ]; then
                   echo "⚠️ Plan output is over 500kb. Download the terraform-plan to view the full plan details."
                   tail -n 2 "$file"
-                elif [ $(wc -l < "$file") -gt 450 ]; then
+                elif [ "${line_count}" -gt 450 ]; then
                   echo "⚠️ Plan is more than 500 lines. Download the terraform-plan to view the full plan details."
                   tail -n 2 "$file"
                 else
@@ -170,29 +171,24 @@ jobs:
                 echo "</details>"
                 echo ""
               done
-
-              echo "${delimiter}"
-            } >> "$GITHUB_OUTPUT"
+            } > "$summary_file"
           fi
 
       # -- Publish Terraform Plan as task summary
       - name: Publish Terraform Plan to Task Summary
         if: steps.tf-plan-string.outputs.has_plans == 'true'
-        env:
-          SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
         run: |
-          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+          cat "${{ steps.tf-plan-string.outputs.summary_file }}" >> "$GITHUB_STEP_SUMMARY"
 
       # -- If this is a PR post the changes
       - name: Push Terraform Output to PR
         if: github.event_name == 'pull_request' && steps.tf-plan-string.outputs.has_plans == 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          SUMMARY: "${{ steps.tf-plan-string.outputs.summary }}"
         with:
           github-token: ${{ github.token }}
           script: |
-            const body = `${process.env.SUMMARY}`;
+            const fs = require('fs');
+            const body = fs.readFileSync('${{ steps.tf-plan-string.outputs.summary_file }}', 'utf8');
             github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,

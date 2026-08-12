@@ -1,5 +1,4 @@
 # MS Graph API permissions https://learn.microsoft.com/en-us/graph/permissions-reference
-data "azuread_client_config" "current" {}
 
 #region Measter
 resource "azuread_application" "maester" {

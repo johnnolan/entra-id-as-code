@@ -56,6 +56,8 @@ Each file currently contains `# TODO` only.
 
 ## Review the repository structure
 
+### Terraform
+
 - `terraform/main.tf`: Terraform version, backend, and provider definitions.
 - `terraform/variables.tf`: Root input variables for `tenant_id` and `client_id`.
 - `terraform/outputs.tf`: Output file. It is currently empty.
@@ -64,9 +66,20 @@ Each file currently contains `# TODO` only.
 - `terraform/named-locations.tf`: Named location resources for Conditional Access.
 - `terraform/conditional-access.tf`: Conditional Access baseline policies.
 - `terraform/security-groups.tf`: Group lifecycle, group settings, and exclusion group resources.
-- `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
 - `terraform/service-principles.tf`: Maester application registration and federated credential.
+
+### Scripts
+
+- `scripts/create-github-service-principle.ps1`: Script to bootstrap the `internal-entra-iac` app registration and service principal.
+- `scripts/create-github-service-principle.md`: Usage guide for the bootstrap script.
+
+### Documentation
+
+- `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
 - `docs/github-setup/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+
+### GitHub Actions workflows
+
 - `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger.
 - `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger.
 - `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow.

@@ -76,15 +76,16 @@ Each file currently contains `# TODO` only.
 ### Documentation
 
 - `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
-- `docs/github-setup/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+- `docs/runbooks/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+- `docs/runbooks/storage-account-network-hardening.md`: Runbook for restricting Terraform state storage account network access and configuring dynamic runner IP allowlisting.
 
 ### GitHub Actions workflows
 
-- `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger.
-- `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger.
-- `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow.
-- `.github/workflows/terraform-maester.yml`: Scheduled Maester test workflow.
-- `.github/workflows/terraform-run.yml`: Reusable Terraform workflow.
+- `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger. See [terraform-plan-pr.md](.github/workflows/terraform-plan-pr.md).
+- `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger. See [terraform-apply-main.md](.github/workflows/terraform-apply-main.md).
+- `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow. See [terraform-drift-daily.md](.github/workflows/terraform-drift-daily.md).
+- `.github/workflows/terraform-maester.yml`: Scheduled Maester test workflow. See [terraform-maester.md](.github/workflows/terraform-maester.md).
+- `.github/workflows/terraform-run.yml`: Reusable Terraform workflow called by all other workflows. See [terraform-run.md](.github/workflows/terraform-run.md).
 
 ## Understand the workflows
 

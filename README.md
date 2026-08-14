@@ -76,7 +76,8 @@ Each file currently contains `# TODO` only.
 ### Documentation
 
 - `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
-- `docs/github-setup/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+- `docs/runbooks/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
+- `docs/runbooks/storage-account-network-hardening.md`: Runbook for restricting Terraform state storage account network access and configuring dynamic runner IP allowlisting.
 
 ### GitHub Actions workflows
 

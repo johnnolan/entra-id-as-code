@@ -80,11 +80,11 @@ Each file currently contains `# TODO` only.
 
 ### GitHub Actions workflows
 
-- `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger.
-- `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger.
-- `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow.
-- `.github/workflows/terraform-maester.yml`: Scheduled Maester test workflow.
-- `.github/workflows/terraform-run.yml`: Reusable Terraform workflow.
+- `.github/workflows/terraform-plan-pr.yml`: Pull request plan trigger. See [terraform-plan-pr.md](.github/workflows/terraform-plan-pr.md).
+- `.github/workflows/terraform-apply-main.yml`: Main branch apply trigger. See [terraform-apply-main.md](.github/workflows/terraform-apply-main.md).
+- `.github/workflows/terraform-drift-daily.yml`: Scheduled drift detection workflow. See [terraform-drift-daily.md](.github/workflows/terraform-drift-daily.md).
+- `.github/workflows/terraform-maester.yml`: Scheduled Maester test workflow. See [terraform-maester.md](.github/workflows/terraform-maester.md).
+- `.github/workflows/terraform-run.yml`: Reusable Terraform workflow called by all other workflows. See [terraform-run.md](.github/workflows/terraform-run.md).
 
 ## Understand the workflows
 

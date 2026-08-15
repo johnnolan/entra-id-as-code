@@ -31,6 +31,19 @@ Configures the tenant's external identities policy (`policies/externalIdentities
 - `allowExternalIdentitiesToLeave = true` — lets external (B2B guest) users remove themselves from the tenant via self-service, instead of requiring an admin to manually offboard them.
 - `allowDeletedIdentitiesDataRemoval = false` — currently a Microsoft Graph property **reserved for future use**; it has no effect today, kept at its default.
 
+## `b2b_management_policy`
+
+Configures the organization-default B2B management policy (`policies/b2bManagementPolicies`, beta). This policy controls the **Collaboration restrictions** section in External Identities.
+
+- `b2b_invitation_domain_mode = "allow_all"` — the default. It matches **Allow invitations to be sent to any domain** and does not create a B2B management policy because Microsoft Entra already uses this behaviour by default.
+- `b2b_invitation_domain_mode = "allow_list"` — matches **Allow invitations only to the specified domains**. Set `b2b_invitation_allowed_domains` to at least one allowed domain.
+- `b2b_invitation_domain_mode = "block_list"` — matches **Deny invitations to the specified domains**. Set `b2b_invitation_blocked_domains` to the blocked domains.
+- Terraform rejects domain lists that do not match the selected mode. Microsoft Entra supports either an allow list or a block list, not both.
+
+To block all invitations, set `allowInvitesFrom = "none"` on `authorization_policy`. Microsoft Graph does not accept an empty B2B allow list.
+
+> **Important:** Microsoft Graph supports this resource only on the beta endpoint. It requires the `Policy.ReadWrite.B2BManagementPolicy` application permission and admin consent. Microsoft Entra permits only one organization-default B2B management policy. Import an existing policy instead of creating another one.
+
 ## `security_defaults`
 
 Configures the tenant's Security Defaults enforcement policy (`policies/identitySecurityDefaultsEnforcementPolicy`, beta).
@@ -48,6 +61,8 @@ Every resource above targets a Microsoft Entra tenant singleton and has a matchi
 - [authorizationPolicy resource type — Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/resources/authorizationpolicy) — property reference for `blockMsolPowerShell`, `allowInvitesFrom`, `guestUserRoleId`, and `defaultUserRolePermissions`.
 - [externalIdentitiesPolicy resource type — Microsoft Graph (beta)](https://learn.microsoft.com/en-us/graph/api/resources/externalidentitiespolicy) — confirms `allowDeletedIdentitiesDataRemoval` is reserved for future use and describes `allowExternalIdentitiesToLeave`.
 - [authenticationFlowsPolicy resource type — Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/resources/authenticationflowspolicy) — property reference for the self-service sign-up flow configuration.
+- [b2bManagementPolicy resource type — Microsoft Graph (beta)](https://learn.microsoft.com/en-us/graph/api/resources/b2bmanagementpolicy?view=graph-rest-beta) — resource reference for B2B invitation domain restrictions.
+- [Allow or block invitations — Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/allow-deny-list) — describes the portal's allow-list and block-list behaviour.
 
 ### Maester test files
 

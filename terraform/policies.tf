@@ -57,6 +57,47 @@ import {
   id = "policies/externalIdentitiesPolicy?api-version=beta"
 }
 
+# Microsoft Graph Application Permission: Policy.ReadWrite.B2BManagementPolicy
+resource "msgraph_resource" "b2b_management_policy" {
+  count = var.b2b_invitation_domain_mode == "allow_all" ? 0 : 1
+
+  url         = "policies/b2bManagementPolicies"
+  api_version = "beta"
+  body = {
+    "@odata.type"         = "#microsoft.graph.b2bManagementPolicy"
+    displayName           = "Default B2B collaboration policy"
+    description           = "Controls the domains that can receive B2B collaboration invitations."
+    isOrganizationDefault = true
+    definition = [
+      jsonencode({
+        B2BManagementPolicy = merge(
+          { Version = 1 },
+          var.b2b_invitation_domain_mode == "allow_list" ? {
+            invitationsAllowedAndBlocked = {
+              AllowedDomains = sort(tolist(var.b2b_invitation_allowed_domains))
+            }
+            } : var.b2b_invitation_domain_mode == "block_list" ? {
+            invitationsAllowedAndBlocked = {
+              BlockedDomains = sort(tolist(var.b2b_invitation_blocked_domains))
+            }
+          } : {}
+        )
+      })
+    ]
+  }
+
+  lifecycle {
+    precondition {
+      condition = (
+        var.b2b_invitation_domain_mode == "allow_all" ? (length(var.b2b_invitation_allowed_domains) == 0 && length(var.b2b_invitation_blocked_domains) == 0) :
+        var.b2b_invitation_domain_mode == "allow_list" ? (length(var.b2b_invitation_allowed_domains) > 0 && length(var.b2b_invitation_blocked_domains) == 0) :
+        length(var.b2b_invitation_allowed_domains) == 0
+      )
+      error_message = "Set domains only for the selected b2b_invitation_domain_mode. An allow_list requires at least one allowed domain."
+    }
+  }
+}
+
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "msgraph_resource" "security_defaults" {
   url         = "policies"

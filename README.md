@@ -198,6 +198,7 @@ This repository includes task-focused Copilot skills in `.github/skills`.
 Available skills:
 
 - `gds-tech-writer`: Rewrite or review technical documentation.
+- `terraform-security-baseline-auditor`: Audit any `terraform/*.tf` file against Microsoft, NCSC, and Maester best practices, close gaps, and create or update a companion markdown guide next to that file. Pay attention to this skill along with `gds-tech-writer` — both apply broadly across the repository rather than to a single file.
 - `terraform-conditional-access-architect`: Review or modify `terraform/conditional-access.tf` with baseline and rollout guardrails.
 - `terraform-main-permissions`: Explain permission context for `terraform/main.tf`.
 - `terraform-named-locations-permissions`: Explain permission context for `terraform/named-locations.tf`.

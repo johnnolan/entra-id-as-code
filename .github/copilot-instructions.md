@@ -20,5 +20,7 @@ Before writing or editing code in this workspace, ALWAYS read and apply the matc
 
 For technical documentation, apply the [gds-tech-writer](skills/gds-tech-writer/SKILL.md) skill.
 
+For auditing any `terraform/*.tf` file against Microsoft, NCSC, and Maester best practices, and creating or updating its companion markdown guide, apply the [terraform-security-baseline-auditor](skills/terraform-security-baseline-auditor/SKILL.md) skill regardless of the file mapping above.
+
 ### Global Mandatory Rule
 Never generate hardcoded tenant IDs, client secrets, or credentials directly in `.tf` files. Always reference inputs via `variables.tf` or Key Vault references.

@@ -148,6 +148,7 @@ Common Microsoft Graph application permissions for the current Terraform impleme
 - `Policy.ReadWrite.Authorization`
 - `Policy.ReadWrite.ExternalIdentities`
 - `Policy.ReadWrite.SecurityDefaults`
+- `Policy.ReadWrite.AuthenticationMethod`
 - `Directory.ReadWrite.All`
 - `Group.ReadWrite.All`
 - `GroupSettings.ReadWrite.All`

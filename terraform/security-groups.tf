@@ -60,3 +60,21 @@ resource "msgraph_resource" "cap_excluded_from_conditional_access" {
     id = "id"
   }
 }
+
+# Microsoft Graph Application Permission: Group.ReadWrite.All
+resource "msgraph_resource" "sec_guest_users" {
+  url = "groups"
+  body = {
+    displayName                   = "SEC-Guest Users"
+    description                   = "Dynamic membership of all guest/external users, for scoping authentication methods."
+    securityEnabled               = true
+    mailEnabled                   = false
+    mailNickname                  = "SECGuestUsers"
+    groupTypes                    = ["DynamicMembership"]
+    membershipRule                = "(user.userType -eq \"Guest\")"
+    membershipRuleProcessingState = "On"
+  }
+  response_export_values = {
+    id = "id"
+  }
+}

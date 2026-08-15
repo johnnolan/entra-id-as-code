@@ -51,7 +51,9 @@ $requiredResourceAccess = @(
             @{ Id = "25f85f3c-f66c-4205-8cd5-de92dd7f0cec"; Type = "Role" } # Policy.ReadWrite.AuthenticationFlows
             @{ Id = "29c18626-4985-4dcd-85c0-193eef327366"; Type = "Role" } # Policy.ReadWrite.AuthenticationMethod
             @{ Id = "fb221be6-99f2-473f-bd32-01c6a0e9ca3b"; Type = "Role" } # Policy.ReadWrite.Authorization
+            @{ Id = "886bd2d9-5b8b-4b49-adea-ca75fb50d9ef"; Type = "Role" } # Policy.ReadWrite.B2BManagementPolicy
             @{ Id = "01c0a623-fc9b-48e9-b794-0756f8e8f067"; Type = "Role" } # Policy.ReadWrite.ConditionalAccess
+            @{ Id = "338163d7-f101-4c92-94ba-ca46fe52447c"; Type = "Role" } # Policy.ReadWrite.CrossTenantAccess
             @{ Id = "03cc4f92-788e-4ede-b93f-199424d144a5"; Type = "Role" } # Policy.ReadWrite.ExternalIdentities
         )
     }

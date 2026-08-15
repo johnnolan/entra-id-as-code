@@ -1,5 +1,5 @@
 resource "msgraph_resource" "auth_method_policy_root" {
-  url = "policies/authenticationMethodsPolicy"
+  url = "policies"
   body = {
     policyMigrationState = "migrationComplete"
   }
@@ -11,7 +11,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_authenticator" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"         = "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration"
     state                 = "enabled"
@@ -51,7 +51,7 @@ import {
 
 resource "msgraph_resource" "auth_method_policy_email" {
   depends_on = [msgraph_resource.sec_guest_users]
-  url        = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Email"
+  url        = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"                = "#microsoft.graph.emailAuthenticationMethodConfiguration"
     state                        = "enabled"
@@ -68,7 +68,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_sms" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Sms"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"  = "#microsoft.graph.smsAuthenticationMethodConfiguration"
     state          = "disabled"
@@ -83,7 +83,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_fido2" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Fido2"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"                    = "#microsoft.graph.fido2AuthenticationMethodConfiguration"
     state                            = "enabled"
@@ -94,7 +94,7 @@ resource "msgraph_resource" "auth_method_policy_fido2" {
     ]
     excludeTargets = []
     keyRestrictions = {
-      isEnforced      = true
+      isEnforced      = false
       enforcementType = "block"
       aaGuids         = []
     }
@@ -107,7 +107,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_software_oath" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/SoftwareOath"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type" = "#microsoft.graph.softwareOathAuthenticationMethodConfiguration"
     state         = "enabled"
@@ -123,7 +123,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_temporary_access_pass" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/TemporaryAccessPass"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"            = "#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration"
     state                    = "enabled"
@@ -144,7 +144,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_voice" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Voice"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"        = "#microsoft.graph.voiceAuthenticationMethodConfiguration"
     state                = "disabled"
@@ -160,23 +160,8 @@ import {
   id = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/Voice"
 }
 
-resource "msgraph_resource" "auth_method_policy_hardware_oath" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/HardwareOath"
-  body = {
-    "@odata.type"  = "#microsoft.graph.hardwareOathAuthenticationMethodConfiguration"
-    state          = "disabled"
-    includeTargets = []
-    excludeTargets = []
-  }
-}
-
-import {
-  to = msgraph_resource.auth_method_policy_hardware_oath
-  id = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/HardwareOath"
-}
-
 resource "msgraph_resource" "auth_method_policy_x509_certificate" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/X509Certificate"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"                  = "#microsoft.graph.x509CertificateAuthenticationMethodConfiguration"
     state                          = "disabled"
@@ -203,9 +188,8 @@ import {
   to = msgraph_resource.auth_method_policy_x509_certificate
   id = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/X509Certificate"
 }
-
 resource "msgraph_resource" "auth_method_policy_verifiable_credentials" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/VerifiableCredentials"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"  = "#microsoft.graph.verifiableCredentialsAuthenticationMethodConfiguration"
     state          = "disabled"
@@ -220,7 +204,7 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_qr_code_pin" {
-  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations/QRCodePin"
+  url = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"                = "#microsoft.graph.qrCodePinAuthenticationMethodConfiguration"
     state                        = "disabled"

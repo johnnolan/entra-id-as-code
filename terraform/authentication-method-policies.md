@@ -47,7 +47,7 @@ Enables FIDO2 security keys and passkeys — a phishing-resistant method.
 
 - `state = "enabled"` and `isSelfServiceRegistrationAllowed = true` — all users can self-register a key without admin help.
 - `isAttestationEnforced = true` — requires the security key to prove (via manufacturer attestation) that it's a genuine, trusted device before registration succeeds.
-- `keyRestrictions.enforcementType = "block"` with an empty `aaGuids` list — no specific key models are blocked by default; the list gives you a way to deny non-compliant hardware later without changing the policy structure.
+- `keyRestrictions.isEnforced = false` with an empty `aaGuids` list — Microsoft Graph requires at least one AAGUID when key restrictions are enforced. Add approved or blocked AAGUIDs and set this to `true` when the organisation has a defined hardware-key policy.
 
 ## `auth_method_policy_software_oath`
 
@@ -68,12 +68,6 @@ Enables Temporary Access Pass (TAP) — a time-limited passcode used to bootstra
 Disables voice call authentication (`state = "disabled"`, `isOfficePhoneAllowed = false`).
 
 - **Why disabled:** Like SMS, voice calls are vulnerable to SIM-swap and call-forwarding fraud, and Microsoft steers customers toward phishing-resistant or app-based methods.
-
-## `auth_method_policy_hardware_oath`
-
-Disables hardware OATH tokens (physical devices that generate one-time codes).
-
-- **Why disabled:** The tenant doesn't issue hardware tokens today. Left disabled to avoid an unused registration surface; enable only if hardware tokens are formally procured.
 
 ## `auth_method_policy_x509_certificate`
 

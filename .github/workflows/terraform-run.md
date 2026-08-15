@@ -19,6 +19,7 @@ Called via `workflow_call` only. Not triggered directly.
 |---|---|
 | `plan_exit_code` | `0` for no changes, `2` for changes (only set when `plan_detailed_exitcode` is true) |
 | `plan_output` | Last 250 lines of the plan output (only set when `plan_detailed_exitcode` is true) |
+| `plan_summary` | Formatted plan summary markdown. Callers post this as a pull request comment or issue body themselves. |
 
 ## Steps
 
@@ -33,7 +34,7 @@ Called via `workflow_call` only. Not triggered directly.
 9. **terraform plan** — generates a plan and saves `plan.txt` and `plan.json` artifacts.
 10. **Drift evaluation** *(plan only, when `plan_detailed_exitcode` is true)* — reads `plan.json` to determine whether changes exist and sets the `plan_exit_code` output.
 11. **terraform apply** *(apply only)* — applies the plan with `-auto-approve`.
-12. **Plan summary** — writes the plan output to the workflow step summary and posts it as a pull request comment when triggered by a pull request.
+12. **Plan summary** — writes the plan output to the workflow step summary and exposes it via the `plan_summary` output for callers to post elsewhere (for example, as a pull request comment).
 13. **Remove runner IP** (`if: always()`) — removes the runner IP from the storage account firewall regardless of job outcome.
 
 ## Secrets required
@@ -54,5 +55,5 @@ Called via `workflow_call` only. Not triggered directly.
 |---|---|
 | `id-token: write` | OIDC token exchange with Entra ID and Azure |
 | `contents: read` | Checkout the repository |
-| `pull-requests: write` | Post plan output as a pull request comment |
-| `issues: write` | Required for drift issue creation by calling workflows |
+
+This workflow does not write to pull requests or issues itself. Callers that need to post the `plan_summary` output as a comment, or raise an issue, must grant themselves the relevant permission (`pull-requests: write` or `issues: write`) on the job that consumes the output.

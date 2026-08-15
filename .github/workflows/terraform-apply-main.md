@@ -22,8 +22,6 @@ This workflow runs `terraform apply` when changes merge to `main`. It applies ap
 |---|---|
 | `id-token: write` | OIDC authentication to Entra ID and Azure |
 | `contents: read` | Checkout the repository |
-| `pull-requests: write` | Required by the reusable workflow |
-| `issues: write` | Required by the reusable workflow |
 
 ## Secrets used
 

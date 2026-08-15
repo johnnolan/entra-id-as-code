@@ -29,6 +29,7 @@ jobs:
         env:
           DRIFT_LABEL: terraform-drift
           DRIFT_TITLE: Terraform drift detected
+          DRIFT_ASSIGNEE: ${{ github.repository_owner }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PLAN_OUTPUT: ${{ needs.terraform-plan-drift.outputs.plan_output }}
         with:
@@ -37,6 +38,7 @@ jobs:
             const repo = context.repo.repo;
             const label = process.env.DRIFT_LABEL;
             const title = process.env.DRIFT_TITLE;
+            const assignee = process.env.DRIFT_ASSIGNEE;
 
             try {
               await github.rest.issues.getLabel({ owner, repo, name: label });
@@ -57,7 +59,7 @@ jobs:
             const body = [
               `Terraform drift was detected by the scheduled workflow run: ${process.env.RUN_URL}`,
               '',
-              'Please review and reconcile the detected changes.',
+              `@${assignee} please review and reconcile the detected changes.`,
               '',
               '<details><summary>Plan Output (tail)</summary>',
               '',
@@ -91,7 +93,8 @@ jobs:
                 repo,
                 title,
                 body,
-                labels: [label]
+                labels: [label],
+                assignees: [assignee]
               });
             }
 

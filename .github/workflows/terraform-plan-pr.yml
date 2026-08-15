@@ -12,8 +12,6 @@ on:
 permissions:
   id-token: write
   contents: read
-  pull-requests: write
-  issues: write
 
 jobs:
   terraform-plan:
@@ -21,3 +19,28 @@ jobs:
     secrets: inherit
     with:
       command: plan
+
+  post-pr-comment:
+    name: Post Plan Comment
+    needs: terraform-plan
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post Plan Comment
+        uses: actions/github-script@v9
+        env:
+          PLAN_SUMMARY: ${{ needs.terraform-plan.outputs.plan_summary }}
+        with:
+          script: |
+            const body = process.env.PLAN_SUMMARY;
+            if (!body) {
+              return;
+            }
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

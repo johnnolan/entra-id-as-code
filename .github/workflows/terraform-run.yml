@@ -19,12 +19,13 @@ on:
       plan_output:
         description: Tail of plan output from detailed plan mode.
         value: ${{ jobs.terraform.outputs.plan_output }}
+      plan_summary:
+        description: Formatted plan summary markdown, for callers to post as a PR comment.
+        value: ${{ jobs.terraform.outputs.plan_summary }}
 
 permissions:
   id-token: write
   contents: read
-  pull-requests: write
-  issues: write
 
 jobs:
   terraform:
@@ -33,6 +34,7 @@ jobs:
     outputs:
       plan_exit_code: ${{ steps.drift_plan.outputs.exit_code }}
       plan_output: ${{ steps.drift_plan.outputs.plan_output }}
+      plan_summary: ${{ steps.tf-plan-summary.outputs.summary_content }}
     defaults:
       run:
         shell: bash
@@ -195,25 +197,16 @@ jobs:
 
       # -- Publish Terraform Plan as task summary
       - name: Publish Terraform Plan to Task Summary
+        id: tf-plan-summary
         if: steps.tf-plan-string.outputs.has_plans == 'true'
         run: |
           cat "${{ steps.tf-plan-string.outputs.summary_file }}" >> "$GITHUB_STEP_SUMMARY"
 
-      # -- If this is a PR post the changes
-      - name: Push Terraform Output to PR
-        if: github.event_name == 'pull_request' && steps.tf-plan-string.outputs.has_plans == 'true'
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            const fs = require('fs');
-            const body = fs.readFileSync('${{ steps.tf-plan-string.outputs.summary_file }}', 'utf8');
-            github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: body
-            });
+          {
+            echo "summary_content<<EOF"
+            cat "${{ steps.tf-plan-string.outputs.summary_file }}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Remove runner IP from state storage account
         if: always()

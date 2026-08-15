@@ -20,7 +20,7 @@ resource "msgraph_resource" "authorization_policy" {
     allowedToUseSSPR                          = true
     allowEmailVerifiedUsersToJoinOrganization = false
     allowInvitesFrom                          = "adminsAndGuestInviters"
-    blockMsolPowerShell                       = false
+    blockMsolPowerShell                       = true
     defaultUserRolePermissions = {
       allowedToCreateApps                      = false
       allowedToCreateSecurityGroups            = false
@@ -105,6 +105,5 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
     "fido2",
     "password,microsoftAuthenticatorPush",
     "password,softwareOath",
-    "password,sms",
   ]
 }

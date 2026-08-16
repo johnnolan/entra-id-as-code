@@ -44,6 +44,7 @@ $requiredResourceAccess = @(
             @{ Id = "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9"; Type = "Role" } # Application.ReadWrite.All
             @{ Id = "19dbc75e-c2e2-444c-a770-ec69d8559fc7"; Type = "Role" } # Directory.ReadWrite.All
             @{ Id = "7e05723c-0bb0-42da-be95-ae9f08a6e53c"; Type = "Role" } # Domain.ReadWrite.All
+            @{ Id = "9acd699f-1e81-4958-b001-93b1d2506e19"; Type = "Role" } # EntitlementManagement.ReadWrite.All
             @{ Id = "62a82d76-70ea-41e2-9197-370581804d09"; Type = "Role" } # Group.ReadWrite.All
             @{ Id = "546168c3-1183-4281-9491-fafb24dea37e"; Type = "Role" } # GroupSettings.ReadWrite.All
             @{ Id = "292d869f-3427-49a8-9dab-8c70152b74e9"; Type = "Role" } # Organization.ReadWrite.All

@@ -99,3 +99,5 @@ In [terraform/security-groups.tf](terraform/security-groups.tf):
 - Import blocks are intentionally not active for these two resources.
 - The default behavior is create-if-missing.
 - You should import only when you confirm objects already exist.
+- `azuread_group.cap_excluded_from_conditional_access` and `azuread_group.sec_guest_users` use the AzureAD provider because it has typed support for security and dynamic-membership groups.
+- `msgraph_resource.group_lifecycle_policy` and `msgraph_resource.groups_settings` remain Graph-managed because AzureAD has no equivalent resources.

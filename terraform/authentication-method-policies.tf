@@ -50,14 +50,14 @@ import {
 }
 
 resource "msgraph_resource" "auth_method_policy_email" {
-  depends_on = [msgraph_resource.sec_guest_users]
+  depends_on = [azuread_group.sec_guest_users]
   url        = "policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
   body = {
     "@odata.type"                = "#microsoft.graph.emailAuthenticationMethodConfiguration"
     state                        = "enabled"
     allowExternalIdToUseEmailOtp = "enabled"
     includeTargets = [
-      { id = msgraph_resource.sec_guest_users.id, targetType = "group" }
+      { id = azuread_group.sec_guest_users.object_id, targetType = "group" }
     ]
   }
 }

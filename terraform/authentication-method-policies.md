@@ -30,10 +30,10 @@ Configures the Microsoft Authenticator app as a passwordless and MFA method.
 
 Configures Email one-time passcode (OTP) sign-in.
 
-- `state = "enabled"` combined with `includeTargets = [{ id = msgraph_resource.sec_guest_users.id, ... }]` restricts Email OTP registration to the `sec_guest_users` dynamic group (see [security-groups.tf](security-groups.tf)), not `all_users`.
+- `state = "enabled"` combined with `includeTargets = [{ id = azuread_group.sec_guest_users.object_id, ... }]` restricts Email OTP registration to the `sec_guest_users` dynamic group (see [security-groups.tf](security-groups.tf)), not `all_users`.
 - **Why guests only:** Microsoft's guidance treats Email OTP as intended for guest and self-service password reset (SSPR) scenarios, not general workforce MFA — it's weaker than app-based or hardware-based methods and more susceptible to phishing.
 - `allowExternalIdToUseEmailOtp = "enabled"` — lets external (B2B/B2C) identities use Email OTP for sign-in, independent of the guest group scoping above.
-- `depends_on = [msgraph_resource.sec_guest_users]` — ensures the guest group exists before Terraform references its `id`.
+- `depends_on = [azuread_group.sec_guest_users]` — ensures the guest group exists before Terraform references its object ID.
 
 ## `auth_method_policy_sms`
 

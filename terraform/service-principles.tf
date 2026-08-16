@@ -138,11 +138,6 @@ resource "azuread_application" "maester" {
       id   = "38d9df27-64da-44fd-b7c5-a6fbac20248f" # UserAuthenticationMethod.Read.All
       type = "Role"
     }
-
-    resource_access {
-      id   = "b4e74841-8e56-480b-be8b-910348b18b4c" # User.ReadWrite
-      type = "Scope"
-    }
   }
 
   web {

@@ -28,7 +28,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Agree the approved FIDO2 vendors and AAGUIDs, populate `aaGuids`, and enable key restrictions.
   - Completion check: Registration of an approved key succeeds, an unapproved key is rejected, and the configuration satisfies Maester `EIDSCA.AF04`.
 
-- [ ] **Review the Maester application's delegated write permission** *(decision required)*
+- [x] **Review the Maester application's delegated write permission** *(decision required)*
   - File: `terraform/service-principles.tf`
   - Problem: The application requests delegated `User.ReadWrite`, although the application is primarily configured for Maester assessment access.
   - Fix: Confirm whether Maester requires this delegated permission. Remove it if it is unused and obtain consent only for required permissions.

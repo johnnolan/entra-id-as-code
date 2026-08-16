@@ -10,7 +10,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Query `GET /policies/authenticationStrengthPolicies`, set tenant-specific inputs, and avoid relying on placeholder defaults.
   - Completion check: Every referenced authentication-strength ID exists in the target tenant and each policy plan resolves to the intended policy.
 
-- [ ] **Restrict default cross-tenant B2B collaboration** *(decision required)*
+- [x] **Restrict default cross-tenant B2B collaboration** *(decision required)*
   - File: `terraform/cross-tenant-access.tf`
   - Problem: Inbound and outbound B2B collaboration allow all applications and all users. This permits broad collaboration with external Entra tenants.
   - Fix: Define approved partner tenants and scope applications, users, and groups. Keep B2B Direct Connect blocked unless there is an approved business requirement.

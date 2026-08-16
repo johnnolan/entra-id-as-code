@@ -3,13 +3,13 @@ resource "msgraph_resource" "cross_tenant_access_policy_default" {
   body = {
     b2bCollaborationInbound = {
       applications = {
-        accessType = "allowed"
+        accessType = "blocked"
         targets = [
           { target = "AllApplications", targetType = "application" }
         ]
       }
       usersAndGroups = {
-        accessType = "allowed"
+        accessType = "blocked"
         targets = [
           { target = "AllUsers", targetType = "user" }
         ]
@@ -17,13 +17,13 @@ resource "msgraph_resource" "cross_tenant_access_policy_default" {
     }
     b2bCollaborationOutbound = {
       applications = {
-        accessType = "allowed"
+        accessType = "blocked"
         targets = [
           { target = "AllApplications", targetType = "application" }
         ]
       }
       usersAndGroups = {
-        accessType = "allowed"
+        accessType = "blocked"
         targets = [
           { target = "AllUsers", targetType = "user" }
         ]

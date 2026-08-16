@@ -8,6 +8,9 @@ Use this skill when validating or troubleshooting permissions for group lifecycl
 ## File Scope
 - `terraform/security-groups.tf`
 
+## Provider Selection
+Use `azuread_group` for security and dynamic-membership groups. Use `msgraph_resource` only for group APIs without an AzureAD resource, such as group lifecycle policies and tenant-wide group settings. Migrate Terraform state before changing an existing resource type.
+
 ## Required Microsoft Graph Application Permissions
 - `Directory.ReadWrite.All`
 - `GroupSettings.ReadWrite.All`
@@ -16,4 +19,5 @@ Use this skill when validating or troubleshooting permissions for group lifecycl
 ## Resources Covered
 - `msgraph_resource.group_lifecycle_policy`
 - `msgraph_resource.groups_settings`
-- `msgraph_resource.cap_excluded_from_conditional_access`
+- `azuread_group.cap_excluded_from_conditional_access`
+- `azuread_group.sec_guest_users`

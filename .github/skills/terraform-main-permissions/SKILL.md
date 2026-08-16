@@ -14,3 +14,4 @@ Use this skill to understand provider and backend configuration scope.
 ## Notes
 - This file configures providers and backend only.
 - Effective permissions are required by resource files that use the providers.
+- Resource skills must prefer AzureAD typed resources and use Microsoft Graph only where AzureAD lacks the required support.

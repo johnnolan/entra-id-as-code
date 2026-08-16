@@ -1,7 +1,7 @@
 ---
 name: terraform-security-baseline-auditor
 description: Trigger when the user asks to audit, harden, review, or validate any terraform/*.tf file that manages Microsoft Graph / Entra ID resources against Microsoft, NCSC, and Maester best practices, and wants a matching markdown guide created or updated next to that file.
-compatibility: Requires terraform, tflint, msgraph provider ~> 0.4
+compatibility: Requires terraform, tflint, azuread provider ~> 3.0, and msgraph provider ~> 0.4
 ---
 
 # terraform-security-baseline-auditor
@@ -31,6 +31,7 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4
 
 ## Repository HCL Conventions
 Apply these regardless of which file is being audited:
+- Prefer a typed `azuread_*` resource when the AzureAD provider supports the resource and required properties. Use `msgraph_resource` only for Microsoft Graph APIs without an AzureAD equivalent. When changing an existing resource type, migrate Terraform state before applying.
 - `msgraph_resource` `body` must be a plain HCL object literal — never wrap it in `jsonencode(...)`. The provider's `body` attribute is structured/dynamic, and Terraform still pretty-prints plan diffs without an explicit `jsonencode()` call.
 - Every resource that targets a fixed, pre-existing API path (anything adopted rather than newly created) must have a matching `import` block directly beneath it:
   ```hcl

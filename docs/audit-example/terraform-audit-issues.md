@@ -22,7 +22,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Confirm the tenant supports the intended workload coverage, then change the mode to the approved setting.
   - Completion check: The resulting Graph policy reports the expected Continuous Access Evaluation mode and the rollout plan includes monitoring for session interruptions.
 
-- [ ] **Define and enforce approved FIDO2 key restrictions** *(decision required)*
+- [x] **Define and enforce approved FIDO2 key restrictions** *(decision required)*
   - File: `terraform/authentication-method-policies.tf`
   - Problem: FIDO2 attestation is enforced, but `keyRestrictions.isEnforced` is `false`.
   - Fix: Agree the approved FIDO2 vendors and AAGUIDs, populate `aaGuids`, and enable key restrictions.

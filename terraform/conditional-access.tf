@@ -518,7 +518,7 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
     }
     sessionControls = {
       continuousAccessEvaluation = {
-        mode = "disabled"
+        mode = "enabled"
       }
     }
   }

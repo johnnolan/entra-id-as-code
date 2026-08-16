@@ -16,7 +16,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Define approved partner tenants and scope applications, users, and groups. Keep B2B Direct Connect blocked unless there is an approved business requirement.
   - Completion check: A policy test confirms that only approved partner configurations permit collaboration and that the default configuration is not broader than intended.
 
-- [ ] **Decide whether to enable Continuous Access Evaluation** *(decision required)*
+- [x] **Decide whether to enable Continuous Access Evaluation** *(decision required)*
   - File: `terraform/conditional-access.tf`
   - Problem: The Continuous Access Evaluation policy is enabled, but its `continuousAccessEvaluation.mode` is explicitly `disabled`.
   - Fix: Confirm the tenant supports the intended workload coverage, then change the mode to the approved setting.

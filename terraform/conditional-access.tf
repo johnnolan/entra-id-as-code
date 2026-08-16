@@ -300,7 +300,7 @@ resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins"
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.passwordless_mfa.id}"
+    authentication_strength_policy_id = azuread_authentication_strength_policy.passwordless_mfa.id
   }
 
   session_controls {
@@ -331,7 +331,7 @@ resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.passwordless_mfa.id}"
+    authentication_strength_policy_id = azuread_authentication_strength_policy.passwordless_mfa.id
   }
 
   session_controls {
@@ -367,7 +367,7 @@ resource "azuread_conditional_access_policy" "ca_2050_grant_mfa_all_users" {
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.default_mfa.id}"
+    authentication_strength_policy_id = azuread_authentication_strength_policy.default_mfa.id
   }
 }
 
@@ -421,7 +421,7 @@ resource "azuread_conditional_access_policy" "ca_2055_grant_phishing_resistant_m
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.phishing_resistant_mfa.id}"
+    authentication_strength_policy_id = azuread_authentication_strength_policy.phishing_resistant_mfa.id
   }
 }
 

@@ -95,6 +95,7 @@ For this repository's current policy resources, common required roles include:
 
 - `Policy.Read.All`
 - `Policy.ReadWrite.ConditionalAccess`
+- `EntitlementManagement.ReadWrite.All`
 
 Add more roles as you add more Terraform resource types.
 

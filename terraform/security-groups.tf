@@ -69,3 +69,12 @@ resource "azuread_group" "sec_guest_users" {
     rule    = "(user.userType -eq \"Guest\")"
   }
 }
+
+# Microsoft Graph Application Permission: Group.ReadWrite.All
+resource "azuread_group" "ap_example_users" {
+  display_name     = "AP-Example Users"
+  description      = "Example entitlement group managed through an access package."
+  security_enabled = true
+  mail_enabled     = false
+  mail_nickname    = "APExampleUsers"
+}

@@ -1,13 +1,3 @@
-variable "authentication_strength_ids" {
-  description = "Map of friendly authentication strength policy name -> object ID. Built-in strengths have well-known IDs in most tenants but confirm via GET /policies/authenticationStrengthPolicies."
-  type        = map(string)
-  default = {
-    passwordless_mfa           = "00000000-0000-0000-0000-000000000003"
-    multifactor_authentication = "00000000-0000-0000-0000-000000000002"
-    phishing_resistant_mfa     = "00000000-0000-0000-0000-000000000004"
-  }
-}
-
 # Policies pulled from https://danielchronlund.com/2020/11/26/azure-ad-conditional-access-policy-design-baseline-with-automatic-deployment-support/
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 # Note: Policies that define an `applications` condition also require `Application.Read.All`.
@@ -310,7 +300,7 @@ resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins"
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.passwordless_mfa}"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.passwordless_mfa.id}"
   }
 
   session_controls {
@@ -341,7 +331,7 @@ resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.passwordless_mfa}"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.passwordless_mfa.id}"
   }
 
   session_controls {
@@ -377,7 +367,7 @@ resource "azuread_conditional_access_policy" "ca_2050_grant_mfa_all_users" {
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.multifactor_authentication}"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.default_mfa.id}"
   }
 }
 
@@ -431,7 +421,7 @@ resource "azuread_conditional_access_policy" "ca_2055_grant_phishing_resistant_m
 
   grant_controls {
     operator                          = "OR"
-    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.phishing_resistant_mfa}"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${azuread_authentication_strength_policy.phishing_resistant_mfa.id}"
   }
 }
 

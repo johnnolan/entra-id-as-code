@@ -4,7 +4,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
 
 ## High priority
 
-- [ ] **Confirm authentication-strength policy IDs**
+- [x] **Confirm authentication-strength policy IDs**
   - File: `terraform/variables.tf`, `terraform/conditional-access.tf`
   - Problem: The default `authentication_strength_ids` values are all-zero UUID placeholders. Conditional Access policies reference these IDs for passwordless, multifactor, and phishing-resistant authentication.
   - Fix: Query `GET /policies/authenticationStrengthPolicies`, set tenant-specific inputs, and avoid relying on placeholder defaults.

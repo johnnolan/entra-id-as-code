@@ -50,8 +50,6 @@ Use a typed `azuread_*` resource when the AzureAD provider supports the Entra ob
 
 The Conditional Access policies, named location, and security groups use AzureAD typed resources. Microsoft Graph continues to manage authentication method policies, tenant-wide policy endpoints, group lifecycle and group settings, cross-tenant access, tenant organization settings, and the Continuous Access Evaluation policy because AzureAD does not expose those APIs or fields.
 
-Changing a managed resource type requires a state migration. Run [scripts/migrate-msgraph-to-azuread-state.sh](scripts/migrate-msgraph-to-azuread-state.sh) with `--dry-run` first, then `--execute` after you review the import IDs and commands.
-
 ## Note the placeholder modules
 
 These Terraform files do not yet have dedicated provider-selection skills:
@@ -80,7 +78,6 @@ Each file currently contains `# TODO` only.
 
 - `scripts/create-github-service-principle.ps1`: Script to bootstrap the `internal-entra-iac` app registration and service principal.
 - `scripts/create-github-service-principle.md`: Usage guide for the bootstrap script.
-- `scripts/migrate-msgraph-to-azuread-state.sh`: Dry-run-first state migration script for resources converted from Microsoft Graph to AzureAD.
 
 ### Documentation
 

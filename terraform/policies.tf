@@ -146,5 +146,26 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
     "fido2",
     "password,microsoftAuthenticatorPush",
     "password,softwareOath",
+    "windowsHelloForBusiness",
+  ]
+}
+
+resource "azuread_authentication_strength_policy" "passwordless_mfa" {
+  display_name = "Passwordless MFA"
+  description  = "Allows FIDO2 passwordless authentication."
+
+  allowed_combinations = [
+    "fido2",
+    "windowsHelloForBusiness",
+  ]
+}
+
+resource "azuread_authentication_strength_policy" "phishing_resistant_mfa" {
+  display_name = "Phishing Resistant MFA"
+  description  = "Requires phishing-resistant FIDO2 authentication."
+
+  allowed_combinations = [
+    "fido2",
+    "windowsHelloForBusiness",
   ]
 }

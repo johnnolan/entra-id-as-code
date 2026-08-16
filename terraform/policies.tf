@@ -114,8 +114,8 @@ import {
 
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 resource "azuread_authentication_strength_policy" "default_mfa" {
-  display_name = "Default MFA"
-  description  = "Baseline authentication strength policy for tenant-wide conditional access."
+  display_name = "EIDAC - Default MFA"
+  description  = "Baseline authentication strength policy for the Entra ID as Code demo tenant."
 
   # Reference: provider-documented allowed_combinations values.
   # Online Reference: https://raw.githubusercontent.com/hashicorp/terraform-provider-azuread/main/docs/resources/authentication_strength_policy.md
@@ -151,8 +151,9 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
 }
 
 resource "azuread_authentication_strength_policy" "passwordless_mfa" {
-  display_name = "Passwordless MFA"
-  description  = "Allows FIDO2 passwordless authentication."
+  depends_on   = [azuread_authentication_strength_policy.default_mfa]
+  display_name = "EIDAC - Passwordless MFA"
+  description  = "Allows FIDO2 and Windows Hello for Business passwordless authentication in the demo tenant."
 
   allowed_combinations = [
     "fido2",
@@ -161,8 +162,9 @@ resource "azuread_authentication_strength_policy" "passwordless_mfa" {
 }
 
 resource "azuread_authentication_strength_policy" "phishing_resistant_mfa" {
-  display_name = "Phishing Resistant MFA"
-  description  = "Requires phishing-resistant FIDO2 authentication."
+  depends_on   = [azuread_authentication_strength_policy.passwordless_mfa]
+  display_name = "EIDAC - Phishing MFA"
+  description  = "Requires phishing-resistant FIDO2 or Windows Hello for Business authentication in the demo tenant."
 
   allowed_combinations = [
     "fido2",

@@ -492,7 +492,8 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
     azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
+  url         = "identity/conditionalAccess/policies"
+  api_version = "beta"
   body = {
     displayName = "GLOBAL - 3040 - SESSION - Continuous Access Evaluation"
     state       = "enabled"
@@ -508,7 +509,7 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
     }
     sessionControls = {
       continuousAccessEvaluation = {
-        mode = "enabled"
+        mode = "strictLocation"
       }
     }
   }

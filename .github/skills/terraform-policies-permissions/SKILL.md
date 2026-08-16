@@ -8,6 +8,9 @@ Use this skill when validating or troubleshooting permissions for tenant policy 
 ## File Scope
 - `terraform/policies.tf`
 
+## Provider Selection
+Use an AzureAD typed resource where it supports the required policy. Use `msgraph_resource` only when AzureAD has no equivalent. The tenant-wide policy endpoints in this file remain Graph-managed; `azuread_authentication_strength_policy.default_mfa` already uses AzureAD.
+
 ## Required Microsoft Graph Application Permissions
 - `Policy.ReadWrite.AuthenticationFlows`
 - `Policy.ReadWrite.Authorization`

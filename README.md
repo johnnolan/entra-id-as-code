@@ -1,6 +1,6 @@
 # Entra ID as Code with Terraform
 
-This repository manages Microsoft Entra ID by using Terraform (an infrastructure as code tool). It uses the `azuread` provider and the `msgraph` provider to manage tenant configuration through Microsoft Graph.
+This repository manages Microsoft Entra ID by using Terraform (an infrastructure as code tool). It uses the official `azuread` provider by default and the `msgraph` provider only for Microsoft Graph APIs that AzureAD does not yet support.
 
 GitHub Actions runs plan, apply, drift detection, and Maester checks. Authentication uses OpenID Connect (OIDC, token-based federated authentication) instead of long-lived client secrets.
 
@@ -44,9 +44,17 @@ Terraform currently manages these Entra resources:
 
 Some tenant objects are singletons. Terraform uses import blocks for some singleton resources so it can adopt existing tenant objects safely.
 
+### Choose a provider
+
+Use a typed `azuread_*` resource when the AzureAD provider supports the Entra object and required properties. Use `msgraph_resource` only when no AzureAD equivalent exists.
+
+The Conditional Access policies, named location, and security groups use AzureAD typed resources. Microsoft Graph continues to manage authentication method policies, tenant-wide policy endpoints, group lifecycle and group settings, cross-tenant access, tenant organization settings, and the Continuous Access Evaluation policy because AzureAD does not expose those APIs or fields.
+
+Changing a managed resource type requires a state migration. Run [scripts/migrate-msgraph-to-azuread-state.sh](scripts/migrate-msgraph-to-azuread-state.sh) with `--dry-run` first, then `--execute` after you review the import IDs and commands.
+
 ## Note the placeholder modules
 
-These Terraform files exist but are still placeholders:
+These Terraform files do not yet have dedicated provider-selection skills:
 
 - `terraform/access-packages.tf`
 - `terraform/authentication-method-policies.tf`
@@ -72,6 +80,7 @@ Each file currently contains `# TODO` only.
 
 - `scripts/create-github-service-principle.ps1`: Script to bootstrap the `internal-entra-iac` app registration and service principal.
 - `scripts/create-github-service-principle.md`: Usage guide for the bootstrap script.
+- `scripts/migrate-msgraph-to-azuread-state.sh`: Dry-run-first state migration script for resources converted from Microsoft Graph to AzureAD.
 
 ### Documentation
 

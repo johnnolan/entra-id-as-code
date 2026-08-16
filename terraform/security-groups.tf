@@ -46,35 +46,26 @@ resource "msgraph_resource" "groups_settings" {
 # terraform import msgraph_resource.groups_settings groupSettings/<GROUPS_SETTINGS_ID>
 
 # Microsoft Graph Application Permission: Group.ReadWrite.All
-resource "msgraph_resource" "cap_excluded_from_conditional_access" {
-  url = "groups"
-  body = {
-    displayName     = "CAP-Excluded from Conditional Access"
-    description     = "Excluded users from Conditional Access rules."
-    securityEnabled = true
-    mailEnabled     = false
-    mailNickname    = "ExcludedfromConditionalAccess"
-    groupTypes      = []
-  }
-  response_export_values = {
-    id = "id"
-  }
+resource "azuread_group" "cap_excluded_from_conditional_access" {
+  display_name     = "CAP-Excluded from Conditional Access"
+  description      = "Excluded users from Conditional Access rules."
+  security_enabled = true
+  mail_enabled     = false
+  mail_nickname    = "ExcludedfromConditionalAccess"
+  types            = []
 }
 
 # Microsoft Graph Application Permission: Group.ReadWrite.All
-resource "msgraph_resource" "sec_guest_users" {
-  url = "groups"
-  body = {
-    displayName                   = "SEC-Guest Users"
-    description                   = "Dynamic membership of all guest/external users, for scoping authentication methods."
-    securityEnabled               = true
-    mailEnabled                   = false
-    mailNickname                  = "SECGuestUsers"
-    groupTypes                    = ["DynamicMembership"]
-    membershipRule                = "(user.userType -eq \"Guest\")"
-    membershipRuleProcessingState = "On"
-  }
-  response_export_values = {
-    id = "id"
+resource "azuread_group" "sec_guest_users" {
+  display_name     = "SEC-Guest Users"
+  description      = "Dynamic membership of all guest/external users, for scoping authentication methods."
+  security_enabled = true
+  mail_enabled     = false
+  mail_nickname    = "SECGuestUsers"
+  types            = ["DynamicMembership"]
+
+  dynamic_membership {
+    enabled = true
+    rule    = "(user.userType -eq \"Guest\")"
   }
 }

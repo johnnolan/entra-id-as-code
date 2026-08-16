@@ -2,6 +2,8 @@
 
 This guide explains each resource in [terraform/policies.tf](policies.tf). These resources manage the tenant-wide Microsoft Entra ID policies that control sign-up flows, authorization defaults, external identity behavior, and whether Security Defaults or the Conditional Access baseline governs sign-in security.
 
+The repository uses typed AzureAD resources where available. The tenant-wide policy endpoints in this file remain `msgraph_resource` because AzureAD has no equivalent resources. `azuread_authentication_strength_policy.default_mfa` uses the AzureAD provider.
+
 ## `authentication_flow_policy`
 
 Configures the tenant's authentication flows policy (`policies/authenticationFlowsPolicy`, beta).
@@ -49,6 +51,13 @@ To block all invitations, set `allowInvitesFrom = "none"` on `authorization_poli
 Configures the tenant's Security Defaults enforcement policy (`policies/identitySecurityDefaultsEnforcementPolicy`, beta).
 
 - `isEnabled = false` — Security Defaults stays disabled because this tenant uses a full custom Conditional Access baseline instead (see [conditional-access.tf](conditional-access.tf)). Running both at once is redundant; Microsoft's guidance is to pick one model. Enabling Security Defaults *and* a custom CA baseline isn't itself unsafe, but this repository standardizes on CA-only.
+
+## `default_mfa`
+
+Creates the `azuread_authentication_strength_policy.default_mfa` authentication strength policy.
+
+- `allowed_combinations` permits the approved FIDO2 and authenticator-based combinations used by Conditional Access policies.
+- The resource uses AzureAD because the provider exposes a typed authentication strength policy resource.
 
 ## Secrets and imports
 

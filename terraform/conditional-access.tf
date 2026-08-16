@@ -11,601 +11,495 @@ variable "authentication_strength_ids" {
 # Policies pulled from https://danielchronlund.com/2020/11/26/azure-ad-conditional-access-policy-design-baseline-with-automatic-deployment-support/
 # Microsoft Graph Application Permissions: Policy.Read.All, Policy.ReadWrite.ConditionalAccess
 # Note: Policies that define an `applications` condition also require `Application.Read.All`.
-resource "msgraph_resource" "ca_1010_block_legacy_auth" {
+resource "azuread_conditional_access_policy" "ca_1010_block_legacy_auth" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1010 - BLOCK - Legacy Authentication"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["exchangeActiveSync", "other"]
+  display_name = "GLOBAL - 1010 - BLOCK - Legacy Authentication"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["exchangeActiveSync", "other"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1020_block_device_code_flow" {
+resource "azuread_conditional_access_policy" "ca_1020_block_device_code_flow" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1020 - BLOCK - Device Code Auth Flow"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-      authenticationFlows = {
-        transferMethods = "deviceCodeFlow,authenticationTransfer"
-      }
+  display_name = "GLOBAL - 1020 - BLOCK - Device Code Auth Flow"
+  state        = "enabled"
+
+  conditions {
+    client_app_types                     = ["all"]
+    authentication_flow_transfer_methods = ["deviceCodeFlow", "authenticationTransfer"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1050_block_high_risk_countries" {
+resource "azuread_conditional_access_policy" "ca_1050_block_high_risk_countries" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1050 - BLOCK - High-Risk Countries"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-      locations = {
-        includeLocations = ["All"]
-        excludeLocations = [msgraph_resource.named_location_restricted_signin.id]
-      }
+  display_name = "GLOBAL - 1050 - BLOCK - High-Risk Countries"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+    }
+    locations {
+      included_locations = ["All"]
+      excluded_locations = [azuread_named_location.named_location_restricted_signin.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1070_block_explicitly_blocked_apps" {
+resource "azuread_conditional_access_policy" "ca_1070_block_explicitly_blocked_apps" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1070 - BLOCK - Explicitly Blocked Cloud Apps"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers = ["All"]
-        excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id
-        ]
-      }
-      applications = {
-        includeApplications = ["None"]
-      }
-      clientAppTypes = ["all"]
+  display_name = "GLOBAL - 1070 - BLOCK - Explicitly Blocked Cloud Apps"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["None"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1080_block_non_admin_sensitive_apps" {
+resource "azuread_conditional_access_policy" "ca_1080_block_non_admin_sensitive_apps" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1080 - BLOCK - Non-Admin Access to Sensitive Apps"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers = ["All"]
-        excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id
-        ]
-      }
-      applications = {
-        includeApplications = ["797f4846-ba00-4fd7-ba43-dac1f8f63013", "MicrosoftAdminPortals"]
-      }
-      clientAppTypes = ["all"]
+  display_name = "GLOBAL - 1080 - BLOCK - Non-Admin Access to Sensitive Apps"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["797f4846-ba00-4fd7-ba43-dac1f8f63013", "MicrosoftAdminPortals"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1085_block_sensitive_apps_untrusted_locations" {
+resource "azuread_conditional_access_policy" "ca_1085_block_sensitive_apps_untrusted_locations" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1085 - BLOCK - Access to Sensitive Apps from untrusted locations"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers = ["All"]
-        excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id
-        ]
-      }
-      applications = {
-        includeApplications = ["MicrosoftAdminPortals", "Office365"]
-      }
-      clientAppTypes = ["all"]
-      locations = {
-        includeLocations = ["All"]
-        excludeLocations = [msgraph_resource.named_location_restricted_signin.id]
-      }
+  display_name = "GLOBAL - 1085 - BLOCK - Access to Sensitive Apps from untrusted locations"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["MicrosoftAdminPortals", "Office365"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+    }
+    locations {
+      included_locations = ["All"]
+      excluded_locations = [azuread_named_location.named_location_restricted_signin.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1088_block_sensitive_apps_noncompliant_devices" {
+resource "azuread_conditional_access_policy" "ca_1088_block_sensitive_apps_noncompliant_devices" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1088 - BLOCK - Access to Sensitive Apps from non-compliant devices"
-    state       = "enabledForReportingButNotEnforced"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["MicrosoftAdminPortals", "Office365"]
-      }
-      clientAppTypes = ["all"]
+  display_name = "GLOBAL - 1088 - BLOCK - Access to Sensitive Apps from non-compliant devices"
+  state        = "enabledForReportingButNotEnforced"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["MicrosoftAdminPortals", "Office365"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["compliantDevice"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["compliantDevice"]
   }
 }
 
-resource "msgraph_resource" "ca_1090_block_high_risk_signins" {
+resource "azuread_conditional_access_policy" "ca_1090_block_high_risk_signins" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1090 - BLOCK - High-Risk Sign-Ins"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes   = ["all"]
-      signInRiskLevels = ["high"]
+  display_name = "GLOBAL - 1090 - BLOCK - High-Risk Sign-Ins"
+  state        = "enabled"
+
+  conditions {
+    client_app_types    = ["all"]
+    sign_in_risk_levels = ["high"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1100_block_high_risk_users" {
+resource "azuread_conditional_access_policy" "ca_1100_block_high_risk_users" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1100 - BLOCK - High-Risk Users"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-      userRiskLevels = ["high"]
+  display_name = "GLOBAL - 1100 - BLOCK - High-Risk Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    user_risk_levels = ["high"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_1110_block_o365_insider_risk" {
+resource "azuread_conditional_access_policy" "ca_1110_block_o365_insider_risk" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 1110 - BLOCK - Access to Office365 apps for users with insider risk"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeUsers  = []
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-        excludeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "b2bDirectConnectUser,otherExternalUser,serviceProvider"
-          externalTenants = {
-            membershipKind = "all"
-          }
+  display_name = "GLOBAL - 1110 - BLOCK - Access to Office365 apps for users with insider risk"
+  state        = "enabled"
+
+  conditions {
+    client_app_types    = ["all"]
+    insider_risk_levels = "elevated"
+    applications {
+      included_applications = ["Office365"]
+    }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      excluded_guests_or_external_users {
+        guest_or_external_user_types = ["b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
         }
       }
-      applications = {
-        includeApplications = ["Office365"]
-      }
-      clientAppTypes    = ["all"]
-      insiderRiskLevels = "elevated"
-    }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["block"]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
   }
 }
 
-resource "msgraph_resource" "ca_2010_grant_medium_risk_signins" {
+resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 2010 - GRANT - Medium-Risk Sign-Ins"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes   = ["all"]
-      signInRiskLevels = ["medium"]
+  display_name = "GLOBAL - 2010 - GRANT - Medium-Risk Sign-Ins"
+  state        = "enabled"
+
+  conditions {
+    client_app_types    = ["all"]
+    sign_in_risk_levels = ["medium"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator = "OR"
-      authenticationStrength = {
-        id = var.authentication_strength_ids.passwordless_mfa
-      }
-    }
-    sessionControls = {
-      signInFrequency = {
-        isEnabled         = true
-        frequencyInterval = "everyTime"
-      }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator                          = "OR"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.passwordless_mfa}"
+  }
+
+  session_controls {
+    sign_in_frequency_interval = "everyTime"
   }
 }
 
-resource "msgraph_resource" "ca_2020_grant_medium_risk_users" {
+resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 2020 - GRANT - Medium-Risk Users"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-      userRiskLevels = ["medium"]
+  display_name = "GLOBAL - 2020 - GRANT - Medium-Risk Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    user_risk_levels = ["medium"]
+    applications {
+      included_applications = ["All"]
     }
-    grantControls = {
-      operator = "OR"
-      authenticationStrength = {
-        id = var.authentication_strength_ids.passwordless_mfa
-      }
-    }
-    sessionControls = {
-      signInFrequency = {
-        isEnabled         = true
-        frequencyInterval = "everyTime"
-      }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator                          = "OR"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.passwordless_mfa}"
+  }
+
+  session_controls {
+    sign_in_frequency_interval = "everyTime"
   }
 }
 
-resource "msgraph_resource" "ca_2050_grant_mfa_all_users" {
+resource "azuread_conditional_access_policy" "ca_2050_grant_mfa_all_users" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 2050 - GRANT - MFA for All Users"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers = ["All"]
-        excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id,
-        ]
-        excludeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
-          externalTenants = {
-            membershipKind = "all"
-          }
+  display_name = "GLOBAL - 2050 - GRANT - MFA for All Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
+    }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      excluded_guests_or_external_users {
+        guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
         }
       }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-    }
-    grantControls = {
-      operator = "OR"
-      authenticationStrength = {
-        id = var.authentication_strength_ids.multifactor_authentication
-      }
     }
   }
-  response_export_values = {
-    id = "id"
+
+  grant_controls {
+    operator                          = "OR"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.multifactor_authentication}"
   }
 }
 
-resource "msgraph_resource" "ca_2051_grant_mfa_guest_users" {
+resource "azuread_conditional_access_policy" "ca_2051_grant_mfa_guest_users" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 2051 - GRANT - MFA for Guest Users"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers = []
-        excludeGroups = [
-          msgraph_resource.cap_excluded_from_conditional_access.id,
-        ]
-        includeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
+  display_name = "GLOBAL - 2051 - GRANT - MFA for Guest Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
+    }
+    users {
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_guests_or_external_users {
+        guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+      }
+    }
+  }
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["mfa"]
+  }
+}
+
+resource "azuread_conditional_access_policy" "ca_2055_grant_phishing_resistant_mfa_admins" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 2055 - GRANT - Phishing Resistant MFA for Admins"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["MicrosoftAdminPortals", "Office365"]
+    }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+    }
+  }
+
+  grant_controls {
+    operator                          = "OR"
+    authentication_strength_policy_id = "/policies/authenticationStrengthPolicies/${var.authentication_strength_ids.phishing_resistant_mfa}"
+  }
+}
+
+resource "azuread_conditional_access_policy" "ca_3020_session_guest_persistent_browser" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 3020 - SESSION - Guest Users All Apps Persistent Browser"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
+    }
+    users {
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_guests_or_external_users {
+        guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
         }
       }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-    }
-    grantControls = {
-      operator        = "OR"
-      builtInControls = ["mfa"]
     }
   }
-  response_export_values = {
-    id = "id"
+
+  session_controls {
+    persistent_browser_mode = "never"
   }
 }
 
-resource "msgraph_resource" "ca_2055_grant_phishing_resistant_mfa_admins" {
+resource "azuread_conditional_access_policy" "ca_3025_session_guest_signin_frequency" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 2055 - GRANT - Phishing Resistant MFA for Admins"
-    state       = "enabled"
-    conditions = {
-      users = {
-        includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-      }
-      applications = {
-        includeApplications = ["MicrosoftAdminPortals", "Office365"]
-      }
-      clientAppTypes = ["all"]
-    }
-    grantControls = {
-      operator = "OR"
-      authenticationStrength = {
-        id = var.authentication_strength_ids.phishing_resistant_mfa
-      }
-    }
-  }
-  response_export_values = {
-    id = "id"
-  }
-}
+  display_name = "GLOBAL - 3025 - SESSION - Guest Users All Apps Sign-in Frequency"
+  state        = "enabled"
 
-resource "msgraph_resource" "ca_3020_session_guest_persistent_browser" {
-  depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
-    msgraph_resource.security_defaults
-  ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 3020 - SESSION - Guest Users All Apps Persistent Browser"
-    state       = "enabled"
-    conditions = {
-      users = {
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-        includeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
-          externalTenants = {
-            membershipKind = "all"
-          }
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
+    }
+    users {
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_guests_or_external_users {
+        guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
         }
       }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-    }
-    sessionControls = {
-      persistentBrowser = {
-        isEnabled = true
-        mode      = "never"
-      }
     }
   }
-  response_export_values = {
-    id = "id"
-  }
-}
 
-resource "msgraph_resource" "ca_3025_session_guest_signin_frequency" {
-  depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
-    msgraph_resource.security_defaults
-  ]
-  url = "identity/conditionalAccess/policies"
-  body = {
-    displayName = "GLOBAL - 3025 - SESSION - Guest Users All Apps Sign-in Frequency"
-    state       = "enabled"
-    conditions = {
-      users = {
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-        includeGuestsOrExternalUsers = {
-          guestOrExternalUserTypes = "internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider"
-          externalTenants = {
-            membershipKind = "all"
-          }
-        }
-      }
-      applications = {
-        includeApplications = ["All"]
-      }
-      clientAppTypes = ["all"]
-    }
-    sessionControls = {
-      signInFrequency = {
-        isEnabled = true
-        type      = "hours"
-        value     = 12
-      }
-      persistentBrowser = {
-        isEnabled = false
-        mode      = "never"
-      }
-    }
-  }
-  response_export_values = {
-    id = "id"
+  session_controls {
+    sign_in_frequency        = 12
+    sign_in_frequency_period = "hours"
   }
 }
 
 resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
   depends_on = [
-    msgraph_resource.cap_excluded_from_conditional_access,
-    msgraph_resource.named_location_restricted_signin,
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
   url = "identity/conditionalAccess/policies"
@@ -615,7 +509,7 @@ resource "msgraph_resource" "ca_3040_session_continuous_access_evaluation" {
     conditions = {
       users = {
         includeUsers  = ["All"]
-        excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
+        excludeGroups = [azuread_group.cap_excluded_from_conditional_access.object_id]
       }
       applications = {
         includeApplications = ["All"]

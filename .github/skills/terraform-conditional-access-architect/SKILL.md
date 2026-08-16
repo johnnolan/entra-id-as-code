@@ -8,7 +8,7 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 
 ## When To Use
 - Apply this skill for any change to Conditional Access policy resources in terraform/conditional-access.tf.
-- Apply this skill when adding new block, grant, or session policies using msgraph_resource.
+- Apply this skill when adding new block, grant, or session policies.
 - Apply this skill when validating that policy logic follows tenant safety controls and operational guardrails.
 
 ## File Scope
@@ -17,16 +17,20 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 - terraform/named-locations.tf
 - terraform/policies.tf
 
+## Provider Selection
+- Use `azuread_conditional_access_policy` for every Conditional Access policy that the AzureAD provider supports.
+- Use `msgraph_resource` only when AzureAD lacks the required field or resource type. In this repository, `ca_3040_session_continuous_access_evaluation` remains Graph-managed because AzureAD does not expose the `continuousAccessEvaluation` session control.
+
 ## Required Permissions
 - Microsoft Graph Application Permission: Policy.Read.All
 - Microsoft Graph Application Permission: Policy.ReadWrite.ConditionalAccess
 - Additional requirement for policies with applications conditions: Application.Read.All
 
 ## Mandatory Guardrails
-- Always exclude break-glass users via msgraph_resource.cap_excluded_from_conditional_access.id in conditions.users.excludeGroups.
+- Always exclude break-glass users via azuread_group.cap_excluded_from_conditional_access.object_id in conditions.users.excluded_groups.
 - Always retain depends_on for:
-	msgraph_resource.cap_excluded_from_conditional_access,
-	msgraph_resource.named_location_restricted_signin,
+	azuread_group.cap_excluded_from_conditional_access,
+	azuread_named_location.named_location_restricted_signin,
 	msgraph_resource.security_defaults.
 - Always keep security defaults disabled when Conditional Access baseline is in use (see msgraph_resource.security_defaults).
 - Never remove or narrow emergency-access exclusions without explicit human approval.
@@ -44,8 +48,7 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 ## Execution Rules
 - Follow resource naming pattern exactly: ca_<4digit>_<block|grant|session>_<purpose>.
 - Follow display name pattern exactly: GLOBAL - <4digit> - <BLOCK|GRANT|SESSION> - <title>.
-- Use url = "identity/conditionalAccess/policies" for every Conditional Access policy resource.
-- Export resource IDs with response_export_values = { id = "id" }.
+- Use AzureAD typed attributes and nested blocks for Conditional Access policies. Do not use a Graph `url`, `body`, or `response_export_values` for AzureAD-managed policies.
 - Prefer authenticationStrength IDs from var.authentication_strength_ids for grant policies.
 - Keep clientAppTypes explicit; default to ["all"] unless policy intent requires exchangeActiveSync and other.
 - Preserve least privilege and zero trust principles aligned to Microsoft Conditional Access guidance and NCSC identity hardening guidance.
@@ -69,94 +72,45 @@ variable "authentication_strength_ids" {
 Use this exact module style and shape for new policies:
 
 ```hcl
-resource "msgraph_resource" "ca_0000_block_example" {
+resource "azuread_conditional_access_policy" "ca_0000_block_example" {
 	depends_on = [
-		msgraph_resource.cap_excluded_from_conditional_access,
-		msgraph_resource.named_location_restricted_signin,
+		azuread_group.cap_excluded_from_conditional_access,
+		azuread_named_location.named_location_restricted_signin,
 		msgraph_resource.security_defaults
 	]
-	url = "identity/conditionalAccess/policies"
-	body = {
-		displayName = "GLOBAL - 0000 - BLOCK - Example Policy"
-		state       = "enabledForReportingButNotEnforced"
-		conditions = {
-			users = {
-				includeUsers  = ["All"]
-				excludeGroups = [msgraph_resource.cap_excluded_from_conditional_access.id]
-			}
-			applications = {
-				includeApplications = ["All"]
-			}
-			clientAppTypes = ["all"]
+	display_name = "GLOBAL - 0000 - BLOCK - Example Policy"
+	state        = "enabledForReportingButNotEnforced"
 
-			# Optional selectors used in this repository
-			# locations = {
-			#   includeLocations = ["All"]
-			#   excludeLocations = [msgraph_resource.named_location_restricted_signin.id]
-			# }
-			# signInRiskLevels = ["high"]
-			# userRiskLevels   = ["medium"]
-			# insiderRiskLevels = "elevated"
-			# authenticationFlows = {
-			#   transferMethods = "deviceCodeFlow,authenticationTransfer"
-			# }
+	conditions {
+		client_app_types = ["all"]
+		applications {
+			included_applications = ["All"]
 		}
-		grantControls = {
-			operator        = "OR"
-			builtInControls = ["block"]
-			# or
-			# authenticationStrength = {
-			#   id = var.authentication_strength_ids.multifactor_authentication
-			# }
+		users {
+			included_users  = ["All"]
+			excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
 		}
-		# Optional session controls used in this repository
-		# sessionControls = {
-		#   signInFrequency = {
-		#     isEnabled         = true
-		#     frequencyInterval = "everyTime"
-		#   }
-		#   persistentBrowser = {
-		#     isEnabled = true
-		#     mode      = "never"
-		#   }
-		#   continuousAccessEvaluation = {
-		#     mode = "disabled"
-		#   }
-		# }
 	}
-	response_export_values = {
-		id = "id"
+
+	grant_controls {
+		operator          = "OR"
+		built_in_controls = ["block"]
 	}
 }
 ```
 
 ## Field Cheat-Sheet
-- state: enabled, enabledForReportingButNotEnforced.
-- conditions.users.includeUsers: ["All"] or [] for guest-only targeting.
-- conditions.users.excludeGroups: include msgraph_resource.cap_excluded_from_conditional_access.id.
-- conditions.users.includeGuestsOrExternalUsers.guestOrExternalUserTypes:
-	internalGuest,b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider.
-- conditions.users.excludeGuestsOrExternalUsers.guestOrExternalUserTypes:
-	b2bDirectConnectUser,otherExternalUser,serviceProvider.
-- conditions.users.*.externalTenants.membershipKind: all.
-- conditions.applications.includeApplications: All, None, Office365, MicrosoftAdminPortals, or explicit app IDs.
-- conditions.clientAppTypes: all, exchangeActiveSync, other.
-- conditions.locations.includeLocations: ["All"].
-- conditions.locations.excludeLocations: [msgraph_resource.named_location_restricted_signin.id].
-- conditions.signInRiskLevels: ["high"], ["medium"].
-- conditions.userRiskLevels: ["high"], ["medium"].
-- conditions.insiderRiskLevels: elevated.
-- conditions.authenticationFlows.transferMethods: deviceCodeFlow,authenticationTransfer.
-- grantControls.operator: OR.
-- grantControls.builtInControls: block, compliantDevice, mfa.
-- grantControls.authenticationStrength.id:
-	var.authentication_strength_ids.passwordless_mfa,
-	var.authentication_strength_ids.multifactor_authentication,
-	var.authentication_strength_ids.phishing_resistant_mfa.
-- sessionControls.signInFrequency:
-	everyTime mode or typed window type = hours, value = 12.
-- sessionControls.persistentBrowser.mode: never.
-- sessionControls.continuousAccessEvaluation.mode: disabled.
+- `conditions.users.included_users`: `All`, `None`, or explicit IDs. Use a guest block for guest-only targeting.
+- `conditions.users.excluded_groups`: include `azuread_group.cap_excluded_from_conditional_access.object_id`.
+- `conditions.users.included_guests_or_external_users` and `excluded_guests_or_external_users`: use `guest_or_external_user_types` and, where required, `external_tenants { membership_kind = "all" }`.
+- `conditions.applications.included_applications`: `All`, `None`, `Office365`, `MicrosoftAdminPortals`, or explicit app IDs.
+- `conditions.client_app_types`: `all`, `exchangeActiveSync`, or `other`.
+- `conditions.locations.excluded_locations`: `azuread_named_location.named_location_restricted_signin.object_id`.
+- `conditions.sign_in_risk_levels`, `user_risk_levels`, `insider_risk_levels`, and `authentication_flow_transfer_methods`: use AzureAD snake_case attributes.
+- `grant_controls.built_in_controls`: `block`, `compliantDevice`, or `mfa`.
+- `grant_controls.authentication_strength_policy_id`: prefix the variable value with `/policies/authenticationStrengthPolicies/`.
+- `session_controls`: use `sign_in_frequency_interval`, `sign_in_frequency`, `sign_in_frequency_period`, and `persistent_browser_mode`.
+- `continuousAccessEvaluation` has no AzureAD equivalent. Use Graph only for that control.
 
 ## Security Control Rules
 - Implement NCSC-aligned identity hardening: phishing-resistant MFA for privileged access, minimal standing privilege, and explicit emergency access design.
@@ -173,7 +127,7 @@ resource "msgraph_resource" "ca_0000_block_example" {
 - Confirm no PR both creates a policy and sets that same policy to enabled.
 - Confirm grants use authentication strength where stronger assurance is required.
 - Confirm location-based controls only trust approved named locations.
-- Confirm policy naming and displayName conform exactly to repository convention.
+- Confirm policy naming and `display_name` conform exactly to repository convention.
 
 * **Compliance & Test Mapping:** When auditing generated policies against official UK Government baseline standards or Maester assertions, consult:
   `references/maester-ncsc-mapping.md`

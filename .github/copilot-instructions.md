@@ -24,3 +24,5 @@ For auditing any `terraform/*.tf` file against Microsoft, NCSC, and Maester best
 
 ### Global Mandatory Rule
 Never generate hardcoded tenant IDs, client secrets, or credentials directly in `.tf` files. Always reference inputs via `variables.tf` or Key Vault references.
+
+For Entra resources, prefer a typed `azuread_*` resource whenever the AzureAD provider supports the required resource and properties. Use `msgraph_resource` only when AzureAD has no equivalent, and migrate Terraform state before changing an existing resource type.

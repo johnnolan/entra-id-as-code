@@ -8,9 +8,12 @@ Use this skill when validating or troubleshooting permissions for named location
 ## File Scope
 - `terraform/named-locations.tf`
 
+## Provider Selection
+Use `azuread_named_location` for named locations. Use `msgraph_resource` only when AzureAD does not support the required named-location capability, and migrate state before changing an existing resource type.
+
 ## Required Microsoft Graph Application Permissions
 - `Policy.Read.All`
 - `Policy.ReadWrite.ConditionalAccess`
 
 ## Resources Covered
-- `msgraph_resource.named_location_restricted_signin`
+- `azuread_named_location.named_location_restricted_signin`

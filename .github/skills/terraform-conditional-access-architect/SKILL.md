@@ -20,7 +20,6 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 ## Provider Selection
 - Use `azuread_conditional_access_policy` for every Conditional Access policy that the AzureAD provider supports.
 - Use `msgraph_resource` only when AzureAD lacks the required field or resource type. In this repository, `ca_3040_session_continuous_access_evaluation` remains Graph-managed because AzureAD does not expose the `continuousAccessEvaluation` session control.
-- Do not replace a managed resource type without a state migration. Use `scripts/migrate-msgraph-to-azuread-state.sh` when converting existing Graph-managed resources.
 
 ## Required Permissions
 - Microsoft Graph Application Permission: Policy.Read.All

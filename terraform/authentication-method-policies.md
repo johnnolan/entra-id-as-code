@@ -25,6 +25,7 @@ Configures the Microsoft Authenticator app as a passwordless and MFA method.
   - `displayLocationInformationRequiredState = "enabled"` — shows the sign-in's approximate location in the prompt.
   - `displayAppInformationRequiredState = "enabled"` — shows which application is requesting the sign-in.
   - `companionAppAllowedState = "default"` — uses the tenant default for companion app (wearables) approvals rather than opting in or out explicitly.
+- Number matching remains mandatory for Microsoft Authenticator push notifications. Microsoft Graph rejects the retired `numberMatchingRequiredState` setting, so Terraform intentionally does not send it.
 
 ## `auth_method_policy_email`
 

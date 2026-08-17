@@ -36,19 +36,19 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
 
 ## Medium priority
 
-- [ ] **Replace `jsonencode` with structured HCL**
+- [x] **Replace `jsonencode` with structured HCL**
   - File: `terraform/policies.tf`
   - Problem: `msgraph_resource.b2b_management_policy` wraps its `definition` object in `jsonencode`, contrary to the repository convention for Graph resource bodies.
   - Fix: Express the nested definition as a plain HCL object while preserving the provider's expected shape.
   - Completion check: `terraform fmt -check -diff`, `terraform validate`, and a plan with both `allow_list` and `block_list` inputs pass without type errors.
 
-- [ ] **Review broad authentication-method targeting** *(decision required)*
+- [x] **Review broad authentication-method targeting** *(decision required)*
   - File: `terraform/authentication-method-policies.tf`
   - Problem: Software OATH, Temporary Access Pass, FIDO2, and several other method configurations target all users. Software OATH in particular may be broader than required.
   - Fix: Confirm the intended user groups for each method. Scope bootstrap and recovery methods to the users who need them.
   - Completion check: Each method has an approved target group, a documented business purpose, and no deleted or unintended group references.
 
-- [ ] **Configure Microsoft Authenticator number matching** *(decision required)*
+- [x] **Configure Microsoft Authenticator number matching** *(decision required)*
   - File: `terraform/authentication-method-policies.tf`
   - Problem: The policy displays application and location information, but no number-matching configuration is defined.
   - Fix: Enable number matching for the approved population and define any rollout exclusions.

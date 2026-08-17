@@ -86,8 +86,8 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Confirm the subject exactly matches the intended GitHub Actions repository, organization, and branch. Consider environment-specific inputs if this configuration is reused.
   - Completion check: A GitHub Actions token from the intended subject exchanges successfully, while tokens from other repositories and branches do not.
 
-- [ ] **Add missing companion guides**
-  - Files: `terraform/main.tf`, `terraform/variables.tf`, `terraform/named-locations.tf`, `terraform/cross-tenant-access.tf`, `terraform/service-principles.tf`, `terraform/tenant.tf`, `terraform/outputs.tf`
+- [x] **Add missing companion guides**
+  - Files: `terraform/main.tf`, `terraform/variables.tf`, `terraform/named-locations.tf`, `terraform/cross-tenant-access.tf`, `terraform/service-principles.tf`, `terraform/tenant.tf`
   - Problem: These Terraform files do not have companion Markdown guides.
   - Fix: Add one guide per file with resource purpose, security rationale, required permissions, and verified Microsoft and Maester references.
   - Completion check: Every non-empty Terraform file has a same-name Markdown guide, and every citation is verified against a stable URL.

@@ -71,7 +71,7 @@ fixed message.
 | MT.1054 | Ensure built-in Device Compliance Policy marks devices with no compliance policy assigned as 'Not compliant' | Medium | Intune |
 | MT.1055 | Microsoft 365 Group (and Team) creation should be restricted to approved users. | Medium | Group |
 | MT.1056 | Ensure that no person has permanent access to all Azure subscriptions at the root scope | High | Privileged |
-| MT.1057 | Ensure Microsoft 365 Group (and Team) expiration is configured to notify users. | Medium | App |
+| MT.1057 | Upstream title says group-expiration notification, but the stable test implementation checks app registrations for client secrets. | Medium | App |
 | MT.1058 | Ensure Microsoft 365 Group (and Team) expiration is configured to auto-expire groups. | Medium | App |
 | MT.1059 | Microsoft Defender for Identity health issues should be resolved | Medium | Defender |
 | MT.1061 | Device registration MFA control conflicts with Conditional Access policies | Medium | CA |

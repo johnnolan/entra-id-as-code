@@ -54,19 +54,19 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Enable number matching for the approved population and define any rollout exclusions.
   - Completion check: The Graph configuration reports number matching enabled for the intended users and Maester checks pass where applicable.
 
-- [ ] **Promote the noncompliant-device policy after rollout** *(decision required)*
+- [x] **Promote the noncompliant-device policy after rollout** *(decision required)*
   - File: `terraform/conditional-access.tf`
   - Problem: `ca_1088_block_sensitive_apps_noncompliant_devices` remains `enabledForReportingButNotEnforced`.
   - Fix: Review report-only results, remediate expected device-registration issues, then promote the policy when approved.
   - Completion check: Enforcement criteria are documented, sign-in impact is reviewed, and the policy state is intentionally enabled or remains report-only with an owner and review date.
 
-- [ ] **Move the group lifecycle notification address to an input**
+- [x] **Move the group lifecycle notification address to an input**
   - File: `terraform/security-groups.tf`, `terraform/variables.tf`
   - Problem: The notification address is hardcoded as `me@johnnolan.dev`.
   - Fix: Add a validated variable for the notification address and use it in the lifecycle policy.
   - Completion check: No owner-specific email remains in the resource file, and the value is supplied through environment-specific Terraform input.
 
-- [ ] **Review guest-addition settings for consistency** *(decision required)*
+- [x] **Review guest-addition settings for consistency** *(decision required)*
   - File: `terraform/security-groups.tf`
   - Problem: `AllowToAddGuests` is `true` while guest access to groups and guest ownership are disabled. The combination may not express the intended collaboration boundary.
   - Fix: Confirm whether guests should be addable to groups, then align the related group settings.
@@ -74,13 +74,13 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
 
 ## Low priority
 
-- [ ] **Remove or replace the placeholder logout URL**
+- [x] **Remove or replace the placeholder logout URL**
   - File: `terraform/service-principles.tf`
   - Problem: The application uses `https://empty-redirect-uri` as `logout_url`.
   - Fix: Remove the property if it is unnecessary, or replace it with a valid HTTPS URL owned by the application.
   - Completion check: The application contains no placeholder URL and Terraform validation still passes.
 
-- [ ] **Review the GitHub federated credential subject**
+- [x] **Review the GitHub federated credential subject**
   - File: `terraform/service-principles.tf`
   - Problem: The subject is tightly coupled to a repository owner and numeric identifiers.
   - Fix: Confirm the subject exactly matches the intended GitHub Actions repository, organization, and branch. Consider environment-specific inputs if this configuration is reused.
@@ -92,7 +92,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Fix: Add one guide per file with resource purpose, security rationale, required permissions, and verified Microsoft and Maester references.
   - Completion check: Every non-empty Terraform file has a same-name Markdown guide, and every citation is verified against a stable URL.
 
-- [ ] **Correct the shared Maester and NCSC mapping**
+- [x] **Correct the shared Maester and NCSC mapping**
   - File: `.github/skills/terraform-security-baseline-auditor/references/maester-ncsc-mapping.md`
   - Problem: Several existing rows use test IDs or names that do not match the current local index. The live `MT.1057` page currently describes application secrets rather than group expiration.
   - Fix: Reverify every existing row against the stable Maester test page and remove or correct stale mappings. Verify NCSC URLs before citing them.

@@ -389,6 +389,9 @@ resource "azuread_conditional_access_policy" "ca_2051_grant_mfa_guest_users" {
       excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
       included_guests_or_external_users {
         guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
+        }
       }
     }
   }

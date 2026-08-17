@@ -1,0 +1,62 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "enabledManagers": [
+    "terraform",
+    "github-actions"
+  ],
+  "timezone": "Etc/UTC",
+  "schedule": [
+    "* 4-7 * * 1"
+  ],
+  "prConcurrentLimit": 5,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps",
+  "labels": [
+    "dependencies",
+    "security"
+  ],
+  "packageRules": [
+    {
+      "description": "Group Terraform provider updates",
+      "matchManagers": [
+        "terraform"
+      ],
+      "matchDatasources": [
+        "terraform-provider"
+      ],
+      "groupName": "Terraform providers",
+      "groupSlug": "terraform-providers",
+      "addLabels": [
+        "terraform"
+      ]
+    },
+    {
+      "description": "Label GitHub Actions updates",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "addLabels": [
+        "github-actions"
+      ]
+    },
+    {
+      "description": "Group non-major GitHub Actions updates",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pinDigest"
+      ],
+      "groupName": "GitHub Actions non-major updates",
+      "groupSlug": "github-actions-non-major"
+    }
+  ]
+}

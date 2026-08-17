@@ -32,7 +32,7 @@ resource "msgraph_resource" "groups_settings" {
       { name = "PrefixSuffixNamingRequirement", value = "" },
       { name = "GuestUsageGuidelinesUrl", value = "" },
       { name = "GroupCreationAllowedGroupId", value = "" },
-      { name = "AllowToAddGuests", value = "true" },
+      { name = "AllowToAddGuests", value = "false" },
       { name = "UsageGuidelinesUrl", value = "" },
       { name = "ClassificationList", value = "" },
     ]

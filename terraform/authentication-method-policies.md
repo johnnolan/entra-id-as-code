@@ -25,6 +25,7 @@ Configures the Microsoft Authenticator app as a passwordless and MFA method.
   - `displayLocationInformationRequiredState = "enabled"` — shows the sign-in's approximate location in the prompt.
   - `displayAppInformationRequiredState = "enabled"` — shows which application is requesting the sign-in.
   - `companionAppAllowedState = "default"` — uses the tenant default for companion app (wearables) approvals rather than opting in or out explicitly.
+- Number matching remains mandatory for Microsoft Authenticator push notifications. Microsoft Graph rejects the retired `numberMatchingRequiredState` setting, so Terraform intentionally does not send it.
 
 ## `auth_method_policy_email`
 
@@ -47,7 +48,10 @@ Enables FIDO2 security keys and passkeys — a phishing-resistant method.
 
 - `state = "enabled"` and `isSelfServiceRegistrationAllowed = true` — all users can self-register a key without admin help.
 - `isAttestationEnforced = true` — requires the security key to prove (via manufacturer attestation) that it's a genuine, trusted device before registration succeeds.
-- `keyRestrictions.isEnforced = false` with an empty `aaGuids` list — Microsoft Graph requires at least one AAGUID when key restrictions are enforced. Add approved or blocked AAGUIDs and set this to `true` when the organisation has a defined hardware-key policy.
+- `keyRestrictions.isEnforced = true` with `enforcementType = "block"` — blocks registration for security keys whose Authenticator Attestation GUID (AAGUID), an identifier for the authenticator make and model, is not approved.
+- `aaGuids` allows the configured YubiKey Bio FIDO Edition models. Microsoft Graph requires at least one AAGUID when key restrictions are enforced.
+
+> **Security requirement:** Review the approved AAGUID list before purchasing or deploying new hardware keys. Users cannot register a key that is not on this allow-list.
 
 ## `auth_method_policy_software_oath`
 

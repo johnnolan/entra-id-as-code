@@ -48,7 +48,7 @@ Enables FIDO2 security keys and passkeys — a phishing-resistant method.
 
 - `state = "enabled"` and `isSelfServiceRegistrationAllowed = true` — all users can self-register a key without admin help.
 - `isAttestationEnforced = true` — requires the security key to prove (via manufacturer attestation) that it's a genuine, trusted device before registration succeeds.
-- `keyRestrictions.isEnforced = true` with `enforcementType = "block"` — blocks registration for security keys whose Authenticator Attestation GUID (AAGUID), an identifier for the authenticator make and model, is not approved.
+- `keyRestrictions.isEnforced = true` with `enforcementType = "allow"` — allows registration only for security keys whose Authenticator Attestation GUID (AAGUID), an identifier for the authenticator make and model, is approved.
 - `aaGuids` allows the configured YubiKey Bio FIDO Edition models. Microsoft Graph requires at least one AAGUID when key restrictions are enforced.
 
 > **Security requirement:** Review the approved AAGUID list before purchasing or deploying new hardware keys. Users cannot register a key that is not on this allow-list.

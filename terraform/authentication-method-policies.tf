@@ -95,7 +95,7 @@ resource "msgraph_resource" "auth_method_policy_fido2" {
     excludeTargets = []
     keyRestrictions = {
       isEnforced      = true
-      enforcementType = "block"
+      enforcementType = "allow"
       aaGuids = [
         "d8522d9f-575b-4866-88a9-ba99fa02f35b", #YubiKey Bio - FIDO Edition 5.5, 5.6
         "dd86a2da-86a0-4cbe-b462-4bd31f57bc6f", #YubiKey Bio - FIDO Edition 5.7

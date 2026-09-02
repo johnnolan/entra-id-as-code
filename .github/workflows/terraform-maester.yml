@@ -9,6 +9,7 @@ permissions:
   id-token: write
   contents: read
   checks: write
+  issues: write
 
 jobs:
   test:
@@ -33,6 +34,49 @@ jobs:
           pester_verbosity: Detailed
           include_tags: "Entra,CA,App,Privileged,Authentication,Governance,Group,General,Entra ID Free,Entra ID P1,Entra ID P2"
           exclude_tags: "Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange"
+
+      - name: File issues for failed tests 🐛
+        if: always() && steps.maester.outputs.results_json != '' && steps.maester.outputs.tests_failed != '0'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $resultsPath = '${{ steps.maester.outputs.results_json }}'
+          if (-not (Test-Path $resultsPath)) {
+            Write-Host "::warning::Results file not found at $resultsPath"
+            exit 0
+          }
+
+          $results = Get-Content -Path $resultsPath -Raw | ConvertFrom-Json
+          $failedTests = @($results.Tests | Where-Object { $_.Result -eq 'Failed' })
+
+          if ($failedTests.Count -eq 0) {
+            Write-Host "No failed tests found."
+            exit 0
+          }
+
+          $label = 'maester'
+          $existingLabel = gh label list --search $label --json name | ConvertFrom-Json | Where-Object { $_.name -eq $label }
+          if (-not $existingLabel) {
+            gh label create $label --color 'B60205' --description 'Failing Maester security test'
+          }
+
+          $openIssues = gh issue list --state open --label $label --limit 500 --json title | ConvertFrom-Json
+          $runUrl = "$($env:GITHUB_SERVER_URL)/$($env:GITHUB_REPOSITORY)/actions/runs/$($env:GITHUB_RUN_ID)"
+
+          foreach ($test in $failedTests) {
+            $title = "Maester: $($test.Name)"
+            if ($openIssues | Where-Object { $_.title -eq $title }) {
+              Write-Host "Issue already open for: $title"
+              continue
+            }
+
+            $errorMessage = if ($test.ErrorRecord) { ($test.ErrorRecord | Select-Object -First 1).Exception.Message } else { $null }
+            $body = "**Test:** $($test.Name)`n**Tags:** $($test.Tag -join ', ')`n`n$errorMessage`n`n[View run]($runUrl)"
+
+            gh issue create --title $title --body $body --label $label
+          }
 
       - name: Write status 📃
         shell: bash

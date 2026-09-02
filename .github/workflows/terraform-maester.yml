@@ -31,6 +31,8 @@ jobs:
           step_summary: true
           artifact_upload_html: true
           pester_verbosity: Detailed
+          include_tags: "Entra,CA,App,Privileged,Authentication,Governance,Group,General,Entra ID Free,Entra ID P1,Entra ID P2"
+          exclude_tags: "Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange"
 
       - name: Write status 📃
         shell: bash

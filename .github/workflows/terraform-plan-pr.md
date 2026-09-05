@@ -4,7 +4,7 @@ This workflow runs `terraform plan` against pull requests targeting `main`. It p
 
 ## Trigger
 
-- Pull request to `main` that modifies files under `terraform/**` or `.github/workflows/**/*.yml`
+- Pull request to `main`
 - `workflow_dispatch` (manual trigger)
 
 ## What it does

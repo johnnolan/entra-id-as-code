@@ -4,7 +4,7 @@ This workflow runs `terraform apply` when changes merge to `main`. It applies ap
 
 ## Trigger
 
-- Push to `main` that modifies files under `terraform/**` or `.github/workflows/**/*.yml`
+- Push to `main`
 - `workflow_dispatch` (manual trigger)
 
 ## What it does

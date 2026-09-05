@@ -7,16 +7,18 @@ Before writing or editing code in this workspace, ALWAYS read and apply the matc
 | Terraform File | Skill |
 |---|---|
 | `terraform/conditional-access.tf` | [terraform-conditional-access-architect](skills/terraform-conditional-access-architect/SKILL.md) |
+| `terraform/group-settings.tf` | [terraform-group-settings-permissions](skills/terraform-group-settings-permissions/SKILL.md) |
 | `terraform/main.tf` | [terraform-main-permissions](skills/terraform-main-permissions/SKILL.md) |
 | `terraform/named-locations.tf` | [terraform-named-locations-permissions](skills/terraform-named-locations-permissions/SKILL.md) |
 | `terraform/outputs.tf` | [terraform-outputs-permissions](skills/terraform-outputs-permissions/SKILL.md) |
 | `terraform/policies.tf` | [terraform-policies-permissions](skills/terraform-policies-permissions/SKILL.md) |
 | `terraform/security-groups.tf` | [terraform-security-groups-permissions](skills/terraform-security-groups-permissions/SKILL.md) |
+| `terraform/service-principles.tf` | [terraform-service-principles-permissions](skills/terraform-service-principles-permissions/SKILL.md) |
 | `terraform/tenant.tf` | [terraform-tenant-permissions](skills/terraform-tenant-permissions/SKILL.md) |
 | `terraform/variables.tf` | [terraform-variables-permissions](skills/terraform-variables-permissions/SKILL.md) |
-| `terraform/access-packages.tf` | *(no skill yet)* |
-| `terraform/authentication-method-policies.tf` | *(no skill yet)* |
-| `terraform/cross-tenant-access.tf` | *(no skill yet)* |
+| `terraform/access-packages.tf` | [terraform-access-packages-permissions](skills/terraform-access-packages-permissions/SKILL.md) |
+| `terraform/authentication-method-policies.tf` | [terraform-authentication-method-policies-permissions](skills/terraform-authentication-method-policies-permissions/SKILL.md) |
+| `terraform/cross-tenant-access.tf` | [terraform-cross-tenant-access-permissions](skills/terraform-cross-tenant-access-permissions/SKILL.md) |
 
 For technical documentation, apply the [gds-tech-writer](skills/gds-tech-writer/SKILL.md) skill.
 

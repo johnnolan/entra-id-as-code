@@ -36,7 +36,6 @@ The following application roles (app-only permissions that act without a signed-
 
 | Permission | Permission ID | Type |
 |---|---|---|
-| `User.Read` | `e1fe6dd8-ba31-4d61-89e7-88639da4683d` | Scope (delegated) |
 | `Application.ReadWrite.All` | `1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9` | Role (application) |
 | `Directory.ReadWrite.All` | `19dbc75e-c2e2-444c-a770-ec69d8559fc7` | Role (application) |
 | `Domain.ReadWrite.All` | `7e05723c-0bb0-42da-be95-ae9f08a6e53c` | Role (application) |

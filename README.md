@@ -250,8 +250,6 @@ terraform validate
 terraform plan -input=false -no-color
 ```
 
-If you use Azure CLI locally, ensure you can get a Microsoft Graph token before you run import or discovery commands.
-
 ## Troubleshoot common issues
 
 - `403 AccessDenied` on Conditional Access resources: add `Application.Read.All` and grant admin consent.

@@ -3,6 +3,7 @@ resource "msgraph_resource" "authentication_flow_policy" {
   url         = "policies"
   api_version = "beta"
   body = {
+    # Disables the self-service sign-up flow so users cannot create accounts through the Entra sign-up experience.
     selfServiceSignUpEnabled = false
   }
 }
@@ -16,23 +17,36 @@ import {
 resource "msgraph_resource" "authorization_policy" {
   url = "policies"
   body = {
-    allowedToSignUpEmailBasedSubscriptions    = false
-    allowedToUseSSPR                          = true
+    # Prevents users from creating email-based subscriptions in Entra without an admin-controlled process.
+    allowedToSignUpEmailBasedSubscriptions = false
+    # Enables self-service password reset for users when it is allowed by the tenant configuration.
+    allowedToUseSSPR = true
+    # Blocks unverified users from joining the organization through an email-based onboarding path.
     allowEmailVerifiedUsersToJoinOrganization = false
-    allowInvitesFrom                          = "adminsAndGuestInviters"
-    blockMsolPowerShell                       = true
+    # Restricts invite creation to administrators and designated guest inviter roles.
+    allowInvitesFrom = "adminsAndGuestInviters"
+    # Disables legacy Msol PowerShell access to reduce the risk of unmanaged tenant administration.
+    blockMsolPowerShell = true
+    # Sets the default permissions granted to standard users, including app creation and permission-grant controls.
     defaultUserRolePermissions = {
-      allowedToCreateApps                      = false
-      allowedToCreateSecurityGroups            = false
-      allowedToCreateTenants                   = false
+      # Prevents regular users from creating new application registrations in Entra.
+      allowedToCreateApps = false
+      # Prevents regular users from creating security groups without an admin-driven process.
+      allowedToCreateSecurityGroups = false
+      # Prevents users from creating new Azure AD tenants or child organizations.
+      allowedToCreateTenants = false
+      # Stops users from reading BitLocker recovery keys for devices they own.
       allowedToReadBitlockerKeysForOwnedDevice = false
-      allowedToReadOtherUsers                  = false
+      # Prevents users from reading other users' profile information by default.
+      allowedToReadOtherUsers = false
+      # Assigns the default permission-grant policies for resource owner and self-service management scenarios.
       permissionGrantPoliciesAssigned = [
         "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
         "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
         "ManagePermissionGrantsForSelf.microsoft-user-default-low",
       ]
     }
+    # Assigns the Restricted Guest role template so guests have the least privileged default access.
     guestUserRoleId = "2af84b1e-32c8-42b7-82bc-daa82404023b" # RestrictedGuest role template id
   }
 }
@@ -47,8 +61,10 @@ resource "msgraph_resource" "external_identity_policy" {
   url         = "policies"
   api_version = "beta"
   body = {
+    # Prevents deleted external identities from being automatically removed from tenant data stores.
     allowDeletedIdentitiesDataRemoval = false
-    allowExternalIdentitiesToLeave    = true
+    # Allows external identities to leave the organization when they no longer need access.
+    allowExternalIdentitiesToLeave = true
   }
 }
 
@@ -64,10 +80,15 @@ resource "msgraph_resource" "b2b_management_policy" {
   url         = "policies/b2bManagementPolicies"
   api_version = "beta"
   body = {
-    "@odata.type"         = "#microsoft.graph.b2bManagementPolicy"
-    displayName           = "Default B2B collaboration policy"
-    description           = "Controls the domains that can receive B2B collaboration invitations."
+    # Identifies this resource as a Microsoft Graph B2B management policy object.
+    "@odata.type" = "#microsoft.graph.b2bManagementPolicy"
+    # Sets the friendly name shown in Entra for the tenant B2B collaboration policy.
+    displayName = "Default B2B collaboration policy"
+    # Describes the purpose of the policy so administrators understand the domain restriction it enforces.
+    description = "Controls the domains that can receive B2B collaboration invitations."
+    # Marks this policy as the organization default for B2B collaboration invitation handling.
     isOrganizationDefault = true
+    # Contains the JSON definition that tells Entra which domains are allowed or blocked for guest invitations.
     definition = [
       jsonencode({
         B2BManagementPolicy = merge(
@@ -103,6 +124,7 @@ resource "msgraph_resource" "security_defaults" {
   url         = "policies"
   api_version = "beta"
   body = {
+    # Disables the legacy security defaults baseline so tenant security is governed by explicit Conditional Access policies.
     isEnabled = false
   }
 }
@@ -142,6 +164,7 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
   # - x509CertificateMultiFactor
   # - x509CertificateSingleFactor
   # Note: some combinations may still be rejected by Graph in specific tenants.
+  # Defines which authentication methods and combinations are considered valid for this baseline MFA strength policy in Entra.
   allowed_combinations = [
     "fido2",
     "password,microsoftAuthenticatorPush",
@@ -150,11 +173,13 @@ resource "azuread_authentication_strength_policy" "default_mfa" {
   ]
 }
 
+
 resource "azuread_authentication_strength_policy" "passwordless_mfa" {
   depends_on   = [azuread_authentication_strength_policy.default_mfa]
   display_name = "EIDAC - Passwordless MFA"
   description  = "Allows FIDO2 and Windows Hello for Business passwordless authentication in the demo tenant."
 
+  # Limits this policy to passwordless methods that satisfy stronger MFA expectations in Entra.
   allowed_combinations = [
     "fido2",
     "windowsHelloForBusiness",
@@ -166,6 +191,7 @@ resource "azuread_authentication_strength_policy" "phishing_resistant_mfa" {
   display_name = "EIDAC - Phishing MFA"
   description  = "Requires phishing-resistant FIDO2 or Windows Hello for Business authentication in the demo tenant."
 
+  # Requires phishing-resistant methods so Entra treats this strength level as resistant to credential theft and MFA fatigue attacks.
   allowed_combinations = [
     "fido2",
     "windowsHelloForBusiness",

@@ -1,103 +1,47 @@
-# Security Groups
+# Security groups
 
-This guide explains how to discover `GROUPS_SETTINGS_ID` and `GROUP_LIFECYCLE_POLICY_ID` for resources in [terraform/security-groups.tf](terraform/security-groups.tf).
+This guide covers the Azure AD security group resources in [terraform/security-groups.tf](terraform/security-groups.tf):
 
-Use these IDs only when the resources already exist in the tenant and you want Terraform to adopt them.
+- `azuread_group.cap_excluded_from_conditional_access`
+- `azuread_group.sec_guest_users`
+- `azuread_group.ap_example_users`
 
-## When you need these IDs
+These are normal Entra security groups and dynamic membership groups, not the Graph group lifecycle or group settings policies.
 
-You need IDs for import when:
+## What these resources do
 
-- A Group Lifecycle Policy already exists.
-- A Group.Unified Group Settings object already exists.
+- `cap_excluded_from_conditional_access` creates a security group used to exclude users from Conditional Access policies.
+- `sec_guest_users` creates a dynamic group containing guest users only, which is useful for scoping authentication methods or access controls.
+- `ap_example_users` creates an example entitlement group for access package testing or demonstration scenarios.
 
-You do not need IDs when:
+These resources can be created from scratch and imported by object ID only if they already exist in the tenant.
 
-- The API returns no existing objects.
-- You want Terraform to create resources from scratch.
+## Import existing groups
 
-## Install Azure CLI on Fedora 44
-
-Run:
+To adopt an existing Azure AD group in Terraform, get the object ID and run:
 
 ```bash
-# 1) Add Microsoft package signing key
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# 2) Add Azure CLI repo
-sudo tee /etc/yum.repos.d/azure-cli.repo >/dev/null <<'EOF'
-[azure-cli]
-name=Azure CLI
-baseurl=https://packages.microsoft.com/yumrepos/azure-cli
-enabled=1
-gpgcheck=1
-gpgkey=https://packages.microsoft.com/keys/microsoft.asc
-EOF
-
-# 3) Install Azure CLI
-sudo dnf install -y azure-cli
-
-# 4) Verify
-az version
+az ad group list --group "CAP-Excluded from Conditional Access" --query "[0].id" -o tsv
+az ad group list --group "SEC-Guest Users" --query "[0].id" -o tsv
+az ad group list --group "AP-Example Users" --query "[0].id" -o tsv
 ```
 
-## Authenticate for Microsoft Graph
-
-Sign in and ensure you request a Graph token (a token for Microsoft Graph API):
+Then import them:
 
 ```bash
-az login --tenant <TENANT_ID>
-az account get-access-token --resource-type ms-graph --query "{tenant:tenant,expires:expiresOn}" -o table
-```
-
-If you get `Unauthorized` or `Permission denied`, ensure your identity or app registration has Graph permissions such as `Group.Read.All` and `Directory.Read.All`.
-
-## Get GROUP_LIFECYCLE_POLICY_ID
-
-Run:
-
-```bash
-az rest --resource https://graph.microsoft.com/ \
-	--method GET \
-	--url "https://graph.microsoft.com/v1.0/groupLifecyclePolicies?$select=id,groupLifetimeInDays,managedGroupTypes"
-```
-
-Read the response:
-
-- If `"value": []`, no lifecycle policy exists. Terraform should create one.
-- If `value` has an object, copy `id` as `GROUP_LIFECYCLE_POLICY_ID`.
-
-## Get GROUPS_SETTINGS_ID (Group.Unified)
-
-Run:
-
-```bash
-az rest --resource https://graph.microsoft.com/ \
-	--method GET \
-	--url "https://graph.microsoft.com/v1.0/groupSettings?$select=id,displayName,templateId"
-```
-
-Find the entry where:
-
-- `templateId` is `62375ab9-6b52-47ed-826b-58e47e0e304b` (the Group.Unified template).
-
-Copy that object `id` as `GROUPS_SETTINGS_ID`.
-
-## Import commands (only if resources already exist)
-
-Use these commands from [terraform](terraform):
-
-```bash
-terraform import msgraph_resource.group_lifecycle_policy groupLifecyclePolicies/<GROUP_LIFECYCLE_POLICY_ID>
-terraform import msgraph_resource.groups_settings groupSettings/<GROUPS_SETTINGS_ID>
+terraform import azuread_group.cap_excluded_from_conditional_access <GROUP_OBJECT_ID>
+terraform import azuread_group.sec_guest_users <GROUP_OBJECT_ID>
+terraform import azuread_group.ap_example_users <GROUP_OBJECT_ID>
 ```
 
 ## Terraform behavior in this repository
 
 In [terraform/security-groups.tf](terraform/security-groups.tf):
 
-- Import blocks are intentionally not active for these two resources.
-- The default behavior is create-if-missing.
-- You should import only when you confirm objects already exist.
-- `azuread_group.cap_excluded_from_conditional_access` and `azuread_group.sec_guest_users` use the AzureAD provider because it has typed support for security and dynamic-membership groups.
-- `msgraph_resource.group_lifecycle_policy` and `msgraph_resource.groups_settings` remain Graph-managed because AzureAD has no equivalent resources.
+- These are AzureAD typed resources because the AzureAD provider supports security groups directly.
+- They are ideal for Microsoft Entra group objects that need consistent Terraform lifecycle management.
+- The Graph-based settings and lifecycle policies are intentionally kept in [terraform/group-settings.tf](terraform/group-settings.tf) because they are not AzureAD group resources.
+
+## Related file
+
+- [terraform/group-settings.md](terraform/group-settings.md) covers the tenant-wide group lifecycle and Group.Unified settings policy objects.

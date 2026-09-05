@@ -77,6 +77,7 @@ Adjust the tags to match the topic.
 - When showing code, prefer short, readable snippets that teach the concept.
 - Use table-based setup summaries when useful for local tool and service setup.
 - Maintain a calm, thoughtful tone rather than a “thought leadership” tone.
+- Use absolute GitHub URLs for repository files, using `https://github.com/johnnolan/entra-id-as-code/blob/main/` as the repository URL prefix. Do not use relative repository links in published articles.
 
 **Do not do:**
 - Do not write as a generic marketing blog.

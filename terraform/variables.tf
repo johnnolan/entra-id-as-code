@@ -30,3 +30,15 @@ variable "b2b_invitation_blocked_domains" {
   type        = set(string)
   default     = []
 }
+
+variable "pim_global_admin_activation_alert_recipients" {
+  description = "Security monitoring mailbox(es) notified when a user activates the eligible Global Administrator role."
+  type        = list(string)
+  default     = ["me@johnnolan.dev"]
+}
+
+variable "pim_privileged_role_activation_alert_recipients" {
+  description = "Security monitoring mailbox(es) notified when a user activates any other highly privileged eligible role (distinct from the Global Administrator recipients)."
+  type        = list(string)
+  default     = ["me@johnnolan.dev"]
+}

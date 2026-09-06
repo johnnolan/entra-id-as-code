@@ -56,6 +56,8 @@ $requiredResourceAccess = @(
             @{ Id = "01c0a623-fc9b-48e9-b794-0756f8e8f067"; Type = "Role" } # Policy.ReadWrite.ConditionalAccess
             @{ Id = "338163d7-f101-4c92-94ba-ca46fe52447c"; Type = "Role" } # Policy.ReadWrite.CrossTenantAccess
             @{ Id = "03cc4f92-788e-4ede-b93f-199424d144a5"; Type = "Role" } # Policy.ReadWrite.ExternalIdentities
+            @{ Id = "483bed4a-2ad3-4361-a73b-c83ccdbdc53c"; Type = "Role" } # RoleManagement.Read.Directory
+            @{ Id = "31e08e0a-d3f7-4ca2-ac39-7343fb83e8ad"; Type = "Role" } # RoleManagementPolicy.ReadWrite.Directory
         )
     }
 )

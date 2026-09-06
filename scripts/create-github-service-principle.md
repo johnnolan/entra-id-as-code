@@ -48,6 +48,8 @@ The following application roles (app-only permissions that act without a signed-
 | `Policy.ReadWrite.Authorization` | `fb221be6-99f2-473f-bd32-01c6a0e9ca3b` | Role (application) |
 | `Policy.ReadWrite.ConditionalAccess` | `01c0a623-fc9b-48e9-b794-0756f8e8f067` | Role (application) |
 | `Policy.ReadWrite.ExternalIdentities` | `03cc4f92-788e-4ede-b93f-199424d144a5` | Role (application) |
+| `RoleManagement.Read.Directory` | `483bed4a-2ad3-4361-a73b-c83ccdbdc53c` | Role (application) |
+| `RoleManagementPolicy.ReadWrite.Directory` | `31e08e0a-d3f7-4ca2-ac39-7343fb83e8ad` | Role (application) |
 
 ## Grant admin consent
 
@@ -56,6 +58,8 @@ The script assigns the permissions but does not grant admin consent. You must gr
 > **Required:** Without admin consent, the service principal cannot call Microsoft Graph. Terraform apply will fail with a `403 Forbidden` response.
 
 > **Important:** `EntitlementManagement.ReadWrite.All` allows the application to manage access packages and their catalog resources. Add it only because this repository manages the access package example in [terraform/access-packages.tf](../terraform/access-packages.tf).
+
+> **Caution:** `RoleManagementPolicy.ReadWrite.Directory` lets the application modify PIM policies for privileged roles, including notification, activation, and approval rules. Microsoft flags this as a permission that allows granting authorization, so review its use carefully. It's required here so Terraform can manage the PIM role activation alert rules in [terraform/privileged-role-notifications.tf](../terraform/privileged-role-notifications.tf).
 
 1. Open the [Entra ID portal](https://entra.microsoft.com)
 2. Go to **App registrations** > **internal-entra-iac** > **API permissions**

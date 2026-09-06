@@ -65,9 +65,9 @@ resource "msgraph_resource" "auth_method_policy_email" {
     # Identifies this configuration as the email OTP authentication method in Entra.
     "@odata.type" = "#microsoft.graph.emailAuthenticationMethodConfiguration"
     # Enables email-based verification as an available authentication method.
-    state = "enabled"
+    state = "disabled"
     # Allows external identities to use email one-time passcodes for secure sign-in.
-    allowExternalIdToUseEmailOtp = "enabled"
+    allowExternalIdToUseEmailOtp = "disabled"
     # Limits email OTP availability to the guest security group so it is targeted to approved users.
     includeTargets = [
       { id = azuread_group.sec_guest_users.object_id, targetType = "group" }

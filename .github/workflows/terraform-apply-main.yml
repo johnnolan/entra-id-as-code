@@ -16,3 +16,5 @@ jobs:
     secrets: inherit
     with:
       command: apply
+      # Requires manual approval from the environment's protection rules before applying to the tenant.
+      environment_name: production

@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      environment_name:
+        description: GitHub environment to gate this run behind. Leave empty for no approval gate.
+        required: false
+        default: ""
+        type: string
     outputs:
       plan_exit_code:
         description: Exit code from detailed plan mode (0 no drift, 2 drift).
@@ -31,6 +36,8 @@ jobs:
   terraform:
     name: Terraform ${{ inputs.command }}
     runs-on: ubuntu-latest
+    # Empty environment_name results in no environment, so plan-only calls skip approval.
+    environment: ${{ inputs.environment_name }}
     outputs:
       plan_exit_code: ${{ steps.drift_plan.outputs.exit_code }}
       plan_output: ${{ steps.drift_plan.outputs.plan_output }}
@@ -143,7 +150,8 @@ jobs:
 
       - name: Terraform Apply
         if: ${{ inputs.command == 'apply' }}
-        run: terraform apply -auto-approve -input=false -no-color
+        # Applies the plan saved above so the applied change matches what was reviewed, not a freshly computed one.
+        run: terraform apply -input=false -no-color tfplan
 
       # -- Create string output of Terraform Plan
       - name: Create String Output

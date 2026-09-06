@@ -22,7 +22,7 @@ jobs:
         uses: maester365/maester-action@910da5adbc61adcd6464ee69e3ab15805c1ad213 #v1.2.0
         with:
           tenant_id: ${{ secrets.ARM_TENANT_ID }}
-          client_id: ${{ secrets.ARM_CLIENT_ID }}
+          client_id: ${{ secrets.ARM_MAESTER_CLIENT_ID }}
           include_public_tests: true
           include_private_tests: false
           include_exchange: false

@@ -290,9 +290,9 @@ resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins"
     applications {
       included_applications = ["All"]
     }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
     users {
-      included_users  = ["All"]
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_users = ["All"]
     }
   }
 
@@ -321,9 +321,9 @@ resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
     applications {
       included_applications = ["All"]
     }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
     users {
-      included_users  = ["All"]
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_users = ["All"]
     }
   }
 
@@ -351,9 +351,9 @@ resource "azuread_conditional_access_policy" "ca_2050_grant_mfa_all_users" {
     applications {
       included_applications = ["All"]
     }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
     users {
-      included_users  = ["All"]
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_users = ["All"]
       excluded_guests_or_external_users {
         guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
         external_tenants {
@@ -383,8 +383,8 @@ resource "azuread_conditional_access_policy" "ca_2051_grant_mfa_guest_users" {
     applications {
       included_applications = ["All"]
     }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
     users {
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
       included_guests_or_external_users {
         guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
         external_tenants {
@@ -414,6 +414,7 @@ resource "azuread_conditional_access_policy" "ca_2055_grant_phishing_resistant_m
     applications {
       included_applications = ["MicrosoftAdminPortals", "Office365"]
     }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
     users {
       included_users  = ["All"]
       excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]

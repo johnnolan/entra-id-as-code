@@ -5,13 +5,13 @@ resource "msgraph_resource" "tenant_details" {
   url = "organization"
   body = {
     # Clears the email list used for general marketing communications from the tenant contact profile.
-    marketingNotificationEmails = []
+    marketingNotificationEmails = ["me@johnnolan.dev"]
     # Clears the email addresses used for security and compliance notifications.
-    securityComplianceNotificationMails = []
+    securityComplianceNotificationMails = ["me@johnnolan.dev"]
     # Clears security and compliance notification phone numbers to avoid unnecessary tenant communications.
     securityComplianceNotificationPhones = []
     # Clears the email list used for technical service notifications about the tenant.
-    technicalNotificationMails = []
+    technicalNotificationMails = ["me@johnnolan.dev"]
   }
 }
 

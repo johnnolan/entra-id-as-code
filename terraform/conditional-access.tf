@@ -16,8 +16,7 @@ resource "azuread_conditional_access_policy" "ca_1010_block_legacy_auth" {
       included_applications = ["All"]
     }
     users {
-      included_users  = ["All"]
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_users = ["All"]
     }
   }
 
@@ -68,8 +67,7 @@ resource "azuread_conditional_access_policy" "ca_1050_block_high_risk_countries"
       included_applications = ["All"]
     }
     users {
-      included_users  = ["All"]
-      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+      included_users = ["All"]
     }
     locations {
       included_locations = ["All"]
@@ -171,7 +169,7 @@ resource "azuread_conditional_access_policy" "ca_1088_block_sensitive_apps_nonco
     msgraph_resource.security_defaults
   ]
   display_name = "GLOBAL - 1088 - BLOCK - Access to Sensitive Apps from non-compliant devices"
-  state        = "enabledForReportingButNotEnforced"
+  state        = "enabled"
 
   conditions {
     client_app_types = ["all"]

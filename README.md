@@ -8,7 +8,7 @@ GitHub Actions runs plan, apply, drift detection, and Maester checks. Authentica
 
 - Define tenant controls in Terraform.
 - Review infrastructure changes in pull requests.
-- Apply approved changes on merge to `main`.
+- Request an approved deployment manually from `main`.
 - Detect configuration drift on a daily schedule.
 - Run Maester security tests on a daily schedule.
 
@@ -95,22 +95,17 @@ Each file currently contains `# TODO` only.
 
 ## Understand the workflows
 
-### Pull request plan
+### Pull request validation
 
-Workflow: `.github/workflows/terraform-plan-pr.yml`
+Workflow: `.github/workflows/terraform-plan-pr.yml`.
 
-- Trigger: pull request to `main`.
-- Path filter: `terraform/**` and `.github/workflows/**/*.yml`.
-- Behavior: runs the reusable Terraform workflow with `command: plan`.
-- Output: uploads plan artifacts, writes a workflow summary, and posts a pull request comment with the plan summary.
+Pull requests to `main` run formatting and provider-schema validation without tenant secrets, OIDC, or backend access. Require the **Terraform Validate** check before merging. This does not produce a live tenant plan.
 
-### Main branch apply
+### Protected manual apply
 
-Workflow: `.github/workflows/terraform-apply-main.yml`
+Workflow: `.github/workflows/terraform-apply-main.yml`.
 
-- Trigger: push to `main`.
-- Path filter: `terraform/**` and `.github/workflows/**/*.yml`.
-- Behavior: runs the reusable Terraform workflow with `command: apply`.
+Merges do not deploy. Manually dispatch on `main` to request a deployment through the `production` environment. After approval, the job creates and applies a saved plan. Configure required reviewers, main branch protection, environment-scoped secrets and Entra federation using [the deployment setup](docs/runbooks/setup-federated-credentials.md). YAML alone does not establish these controls. Apply stays disabled until `TERRAFORM_APPLY_ENABLED=true` is set in the production environment.
 
 ### Daily drift detection
 
@@ -130,7 +125,7 @@ Workflow: `.github/workflows/terraform-maester.yml`
 
 ## Configure required GitHub secrets
 
-Set these GitHub Actions secrets:
+Set these GitHub Actions secrets in the separate `production` and `terraform-plan` environments, using different identities as described in [the deployment setup](docs/runbooks/setup-federated-credentials.md):
 
 - `ARM_CLIENT_ID`: Entra application client ID.
 - `ARM_TENANT_ID`: Entra tenant ID.

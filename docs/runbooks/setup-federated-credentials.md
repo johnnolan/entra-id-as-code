@@ -16,11 +16,14 @@ Collect these values first:
 - Entra tenant ID.
 - Azure subscription ID.
 - GitHub owner and repository name.
+- GitHub organization ID and repository ID.
 
 Use this repository as an example:
 
 - Owner: `johnnolan`
 - Repository: `entra-id-as-code`
+- Organization ID: Get this value from the repository OIDC configuration.
+- Repository ID: Get this value from the repository OIDC configuration.
 
 ## Step 1: Create the app registration
 
@@ -57,7 +60,7 @@ Set these fields:
 
 Expected subject identifier format:
 
-- `repo:johnnolan/entra-id-as-code:pull_request`
+- `repository_owner_id:ORGANIZATION_ID:repository_id:REPOSITORY_ID:context:pull_request`
 
 ### Credential B: production apply
 
@@ -71,14 +74,15 @@ Set these fields:
 
 Expected subject identifier format:
 
-- `repo:johnnolan/entra-id-as-code:environment:production`
+- `repository_owner_id:ORGANIZATION_ID:repository_id:REPOSITORY_ID:context:environment:production`
 
 The apply job selects `production`, so its default subject includes the environment. Configure required reviewers and restrict deployment branches to `main` in GitHub.
 The workflow also supports manual dispatch; environment branch restrictions must enforce which refs may deploy.
 
-The examples use name-based subjects. Confirm your repository's actual subject format, including any immutable IDs or customization.
+The examples use GitHub organization and repository IDs. Replace `ORGANIZATION_ID` and `REPOSITORY_ID` with the values GitHub shows in your repository's OIDC configuration. GitHub derives the exact subject from its configured claim template.
+For `johnnolan/johnnolan.dev`, open [OIDC configuration](https://github.com/johnnolan/johnnolan.dev/settings/actions/oidc-configuration) in repository settings.
 See [GitHub OIDC subject guidance](https://docs.github.com/en/actions/reference/security/oidc#example-subject-claims).
-Scheduled drift and manual plan runs without an environment need a matching branch subject, such as `repo:johnnolan/entra-id-as-code:ref:refs/heads/main`.
+Scheduled drift and manual plan runs without an environment need a matching branch subject, such as `repository_owner_id:ORGANIZATION_ID:repository_id:REPOSITORY_ID:ref:refs/heads/main`.
 
 ### Verify issuer and audience
 
@@ -172,8 +176,4 @@ Fix: Assign RBAC to the app service principal at the storage scope.
 
 ## Where to find your GitHub IDs
 
-Organization ID: Open a new tab and go to [https://api.github.com/users/johnnolan](https://api.github.com/users/johnnolan) (use /orgs/johnnolan if it is explicitly set up as an organization rather than a user account). Look for the `"id":` field near the very top of the JSON output.
-
-- User account ID: [https://api.github.com/users/johnnolan](https://api.github.com/users/johnnolan)
-- Organization ID: [https://api.github.com/orgs/johnnolan](https://api.github.com/orgs/johnnolan)
-- Repository ID: [https://api.github.com/repos/johnnolan/entra-id-as-code](https://api.github.com/repos/johnnolan/entra-id-as-code)
+Open your repository's **Settings** > **Actions** > **OIDC configuration**. GitHub shows the organization ID, repository ID, and the exact subject identifier that Entra must match.

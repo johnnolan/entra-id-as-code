@@ -1,10 +1,11 @@
 ---
 name: terraform-security-baseline-auditor
-description: Trigger when the user asks to audit, harden, review, or validate any terraform/*.tf file that manages Microsoft Graph / Entra ID resources against Microsoft, NCSC, and Maester best practices, and wants a matching markdown guide created or updated next to that file.
-compatibility: Requires terraform, tflint, azuread provider ~> 3.0, and msgraph provider ~> 0.4
+description: Review Terraform Entra ID resources against Microsoft, NCSC, and Maester guidance. Use for requested security audits, baseline alignment, remediation, or evidence-backed companion guides; ordinary edits do not require a full audit.
 ---
 
 # terraform-security-baseline-auditor
+
+For Terraform edits, use Terraform and TFLint with the provider versions configured in [terraform/main.tf](../../../terraform/main.tf).
 
 ## When To Use
 - The user asks to audit, review, or "check best practices" for any file under `terraform/`.
@@ -15,6 +16,13 @@ compatibility: Requires terraform, tflint, azuread provider ~> 3.0, and msgraph 
 ## Inputs
 - The target `.tf` file. If the user doesn't name one, use the active editor file or ask which file to audit.
 
+## Choose the requested outcome
+
+- **Review or audit:** return findings, evidence, affected resources, operational impact, and recommended changes. Do not edit Terraform, guides, or reference indexes.
+- **Remediation:** make focused repository edits when requested. Preserve existing authorization and identify any decisions still needed.
+- **Guide authoring:** create or update the requested guide; report configuration gaps without silently changing Terraform.
+- Ordinary edits do not trigger a full baseline audit merely because they touch Terraform.
+
 ## Workflow
 1. **Read the target file fully.** Identify every `resource` block: its Terraform type, the Microsoft Graph (or other API) path it manages (`url` / equivalent), and every property currently set.
 2. **Research best practice per resource**, using three source categories, in this order:
@@ -24,10 +32,13 @@ compatibility: Requires terraform, tflint, azuread provider ~> 3.0, and msgraph 
    - **Never fabricate a test ID, article title, or URL.** Verify every citation with a live fetch before including it in code or documentation. If a claim can't be verified, say so instead of guessing.
    - **Never cite `/docs/next/tests/...` pages** (Maester's unreleased preview docs) in generated documentation — only cite the stable `/docs/tests/...` release path, even if you used `/next/` to check upcoming test coverage.
 3. **Compare** the current `.tf` configuration against the researched best practice, resource by resource.
-4. **Close gaps with the minimal Terraform change needed**, following the "Repository HCL Conventions" below. Don't refactor unrelated resources.
-5. **Flag (don't silently apply) any change that alters live tenant behavior in a non-additive way** — for example disabling a currently enabled feature, narrowing an exclusion, or changing a target group. Ask the user before applying these; safe, additive hardening (adding attestation, shortening a lifetime, adding an `import` block) can be applied directly.
-6. **Validate**: run `terraform fmt` and `terraform validate` after every edit.
-7. **Create or update the companion markdown file** at the same path and base name as the `.tf` file (for example `terraform/foo.tf` → `terraform/foo.md`).
+4. **Report findings** with verified evidence, current behavior, recommended behavior, and affected users or workloads. Distinguish facts from assumptions.
+5. **Assess operational impact** before remediation. Attestation, shorter lifetimes, new restrictions, and import adoption can affect existing users or resources.
+   - Prepare requested repository edits within the user's scope. Additive changes are not automatically safe.
+   - Identify rollout, rollback, permission, and state implications. Ask only for missing decisions or authorization; do not repeat approvals already provided.
+   - Repository edits do not authorize live apply, state mutation, permission grants, or deployment dispatch. Follow the root guidance and domain rollout rules.
+6. **Validate changed Terraform** using [CONTRIBUTING.md](../../../CONTRIBUTING.md#local-validation-steps). Run formatting and schema checks after a coherent edit, and report unavailable checks.
+7. **Update documentation within scope.** For remediation, update the companion guide when behavior changes. For guide requests, write the requested guide. Review-only work leaves files unchanged.
 
 ## Repository HCL Conventions
 Apply these regardless of which file is being audited:
@@ -40,9 +51,9 @@ Apply these regardless of which file is being audited:
     id = "<same value as the resource's url/path>"
   }
   ```
-- Use `depends_on` only when a resource's body references another resource's `.id` or output.
+- Prefer expression references for inferred dependencies. Use explicit `depends_on` for required ordering Terraform cannot infer, and explain the reason. Preserve the Conditional Access baseline dependency convention described in its domain skill; do not remove dependencies during an unrelated audit. See [Terraform dependency guidance](https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on).
 - Keep one resource per logical entity; don't combine multiple entities into a single resource block.
-- Never hardcode tenant IDs, client secrets, or credentials directly in `.tf` files — reference `variables.tf` or Key Vault, per the repository-wide rule in `.github/copilot-instructions.md`.
+- Never hardcode tenant IDs, client secrets, or credentials directly in `.tf` files — reference `variables.tf` or Key Vault, per the shared rules in [AGENTS.md](../../../AGENTS.md).
 
 ## Markdown Guide Requirements (`terraform/<name>.md`)
 - A title describing the file's purpose, and a one-line summary of what the resources collectively manage.
@@ -61,15 +72,15 @@ individual test page to confirm a test still exists and get its current descript
 Refresh an index by re-fetching its stable listing page (linked at the top of each file) if a lookup that should
 exist is missing, or periodically if the index looks old.
 
-Maintain a running table of audited controls in `references/maester-ncsc-mapping.md`. When auditing a file:
+For requested remediation or guide authoring, maintain verified controls in `references/maester-ncsc-mapping.md`. For review-only work, consult the table without changing it:
 - Check whether relevant rows already exist for the resource types involved.
 - Add new rows for any newly verified Area/Control → Maester Test ID(s) → NCSC/Microsoft alignment → link, rather than creating a new mapping file per Terraform file.
 
 ## Validation Checklist For Agents
 - Confirm every Microsoft/NCSC/Maester reference cited was verified via a live fetch during this session, not recalled from memory.
 - Confirm no citation points at a `/docs/next/tests/...` (preview) Maester URL.
-- Confirm `terraform fmt` and `terraform validate` both pass after any edit.
-- Confirm a markdown guide exists at the same path/basename as the audited `.tf` file and reflects its current state.
+- For Terraform edits, report formatting, validation, and lint results separately from any authorized live plan.
+- For remediation or guide authoring, confirm the requested companion guide reflects current behavior. For review-only work, report documentation gaps without editing.
 - Confirm HCL conventions are followed (no `jsonencode`, `import` blocks present where needed, `depends_on` only where needed).
-- Confirm no non-additive/breaking change was applied without asking the user first.
-- Confirm `references/maester-ncsc-mapping.md` was updated with any newly verified controls.
+- Confirm repository edits match the requested scope and live operations have separate authorization.
+- Update `references/maester-ncsc-mapping.md` with newly verified controls only when remediation or guide authoring is requested.

@@ -1,3 +1,8 @@
+---
+name: terraform-tenant-permissions
+description: "Lists Microsoft Graph application permissions required by `terraform/tenant.tf`. Use this skill when validating or troubleshooting permissions for organization settings resources."
+---
+
 # terraform-tenant-permissions
 
 **Description:** Lists Microsoft Graph application permissions required by `terraform/tenant.tf`.

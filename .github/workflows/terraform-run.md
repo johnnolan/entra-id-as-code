@@ -11,6 +11,7 @@ Called via `workflow_call` only. Not triggered directly.
 | Input | Required | Default | Description |
 |---|---|---|---|
 | `command` | Yes | — | Terraform command to run: `plan` or `apply` |
+| `environment_name` | No | Empty | GitHub environment used by the job; apply passes `production`, plan callers leave it empty |
 | `plan_detailed_exitcode` | No | `false` | Emit exit code `2` when the plan contains changes (used by drift detection) |
 
 ## Outputs
@@ -33,7 +34,7 @@ Called via `workflow_call` only. Not triggered directly.
 8. **terraform validate** — validates configuration syntax and provider schema.
 9. **terraform plan** — generates a plan and saves `plan.txt` and `plan.json` artifacts.
 10. **Drift evaluation** *(plan only, when `plan_detailed_exitcode` is true)* — reads `plan.json` to determine whether changes exist and sets the `plan_exit_code` output.
-11. **terraform apply** *(apply only)* — applies the plan with `-auto-approve`.
+11. **terraform apply** *(apply only)* — applies the saved plan using `terraform apply -input=false -no-color tfplan`.
 12. **Plan summary** — writes the plan output to the workflow step summary and exposes it via the `plan_summary` output for callers to post elsewhere (for example, as a pull request comment).
 13. **Remove runner IP** (`if: always()`) — removes the runner IP from the storage account firewall regardless of job outcome.
 

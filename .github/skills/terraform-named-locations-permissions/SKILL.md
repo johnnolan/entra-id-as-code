@@ -1,3 +1,8 @@
+---
+name: terraform-named-locations-permissions
+description: "Lists Microsoft Graph application permissions required by `terraform/named-locations.tf`. Use this skill when validating or troubleshooting permissions for named location resources."
+---
+
 # terraform-named-locations-permissions
 
 **Description:** Lists Microsoft Graph application permissions required by `terraform/named-locations.tf`.

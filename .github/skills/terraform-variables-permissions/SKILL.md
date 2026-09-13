@@ -1,3 +1,8 @@
+---
+name: terraform-variables-permissions
+description: "Describes permission context for `terraform/variables.tf`. Use this skill to document that this file defines inputs only."
+---
+
 # terraform-variables-permissions
 
 **Description:** Describes permission context for `terraform/variables.tf`.

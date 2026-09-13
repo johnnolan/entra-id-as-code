@@ -8,7 +8,7 @@ GitHub Actions runs plan, apply, drift detection, and Maester checks. Authentica
 
 - Define tenant controls in Terraform.
 - Review infrastructure changes in pull requests.
-- Request an approved deployment manually from `main`.
+- Deploy through the `production` environment on pushes to `main` or manual dispatch.
 - Detect configuration drift on a daily schedule.
 - Run Maester security tests on a daily schedule.
 
@@ -50,15 +50,10 @@ Use a typed `azuread_*` resource when the AzureAD provider supports the Entra ob
 
 The Conditional Access policies, named location, and security groups use AzureAD typed resources. Microsoft Graph continues to manage authentication method policies, tenant-wide policy endpoints, group lifecycle and group settings, cross-tenant access, tenant organization settings, and the Continuous Access Evaluation policy because AzureAD does not expose those APIs or fields.
 
-## Note the placeholder modules
+## Explore additional resource areas
 
-These Terraform files do not yet have dedicated provider-selection skills:
-
-- `terraform/access-packages.tf`
-- `terraform/authentication-method-policies.tf`
-- `terraform/cross-tenant-access.tf`
-
-Each file currently contains `# TODO` only.
+Access packages, authentication method policies, and cross-tenant access have implemented resources and dedicated domain skills.
+Use [AGENTS.md](AGENTS.md#find-domain-guidance) to find their guides and permission context.
 
 ## Review the repository structure
 
@@ -99,13 +94,17 @@ Each file currently contains `# TODO` only.
 
 Workflow: `.github/workflows/terraform-plan-pr.yml`.
 
-Pull requests to `main` run formatting and provider-schema validation without tenant secrets, OIDC, or backend access. Require the **Terraform Validate** check before merging. This does not produce a live tenant plan.
+Pull requests to `main` call the reusable workflow with `command: plan` and inherited secrets. It uses OIDC and backend access, runs static checks, and creates a live tenant plan. The workflow also temporarily changes the state storage firewall. Require the successful plan job before merging; this is not credential-free validation.
 
-### Protected manual apply
+### Apply through the production environment
 
 Workflow: `.github/workflows/terraform-apply-main.yml`.
 
-Merges do not deploy. Manually dispatch on `main` to request a deployment through the `production` environment. After approval, the job creates and applies a saved plan. Configure required reviewers, main branch protection, environment-scoped secrets and Entra federation using [the deployment setup](docs/runbooks/setup-federated-credentials.md). YAML alone does not establish these controls. Apply stays disabled until `TERRAFORM_APPLY_ENABLED=true` is set in the production environment.
+Pushes to `main` and manual dispatches start the apply workflow using the `production` environment.
+Configure required reviewers and deployment branch restrictions in GitHub; the YAML alone does not establish these protections.
+After any environment approval, the job generates and applies its own saved plan. This is a new plan, not the PR plan artifact.
+There is no `TERRAFORM_APPLY_ENABLED` switch in the current workflow.
+See [deployment setup](docs/runbooks/setup-federated-credentials.md) for federation and environment configuration.
 
 ### Daily drift detection
 
@@ -125,7 +124,7 @@ Workflow: `.github/workflows/terraform-maester.yml`
 
 ## Configure required GitHub secrets
 
-Set these GitHub Actions secrets in the separate `production` and `terraform-plan` environments, using different identities as described in [the deployment setup](docs/runbooks/setup-federated-credentials.md):
+The current callers inherit secrets. Plan runs do not select an environment; apply selects `production` and can use its environment secrets. Configure the values using [the deployment setup](docs/runbooks/setup-federated-credentials.md):
 
 - `ARM_CLIENT_ID`: Entra application client ID.
 - `ARM_TENANT_ID`: Entra tenant ID.
@@ -196,29 +195,14 @@ Terraform creates the Maester application registration in `terraform/service-pri
 
 Grant admin consent after you create or update these permissions.
 
-## Use the included Copilot skills
+## Work with repository guidance
 
-This repository includes task-focused Copilot skills in `.github/skills`.
+Start with [AGENTS.md](AGENTS.md) for shared engineering expectations and the maintained file-to-skill mapping.
+The task-focused skills in `.github/skills/` support evidence-based reviews, permission checks, implementation, and technical writing.
+Agents can read these files directly when their client does not discover them automatically.
 
-Available skills:
-
-- `gds-tech-writer`: Rewrite or review technical documentation.
-- `terraform-security-baseline-auditor`: Audit any `terraform/*.tf` file against Microsoft, NCSC, and Maester best practices, close gaps, and create or update a companion markdown guide next to that file. Pay attention to this skill along with `gds-tech-writer` — both apply broadly across the repository rather than to a single file.
-- `terraform-conditional-access-architect`: Review or modify `terraform/conditional-access.tf` with baseline and rollout guardrails.
-- `terraform-main-permissions`: Explain permission context for `terraform/main.tf`.
-- `terraform-named-locations-permissions`: Explain permission context for `terraform/named-locations.tf`.
-- `terraform-outputs-permissions`: Explain permission context for `terraform/outputs.tf`.
-- `terraform-policies-permissions`: Explain permission context for `terraform/policies.tf`.
-- `terraform-security-groups-permissions`: Explain permission context for `terraform/security-groups.tf`.
-- `terraform-tenant-permissions`: Explain permission context for `terraform/tenant.tf`.
-- `terraform-variables-permissions`: Explain permission context for `terraform/variables.tf`.
-
-Files without a dedicated skill yet include:
-
-- `terraform/access-packages.tf`
-- `terraform/authentication-method-policies.tf`
-- `terraform/cross-tenant-access.tf`
-- `terraform/service-principles.tf`
+[CONTRIBUTING.md](CONTRIBUTING.md) explains how to validate changes and verify guidance discovery.
+Companion Terraform guides explain resource intent and supporting evidence. Audit requests produce findings; remediation follows the requested scope.
 
 ## Run Terraform locally
 
@@ -250,7 +234,7 @@ terraform plan -input=false -no-color
 - `403 AccessDenied` on Conditional Access resources: add `Application.Read.All` and grant admin consent.
 - Invalid authentication strength ID: confirm the built-in IDs or query `/policies/authenticationStrengthPolicies`.
 - Group settings or lifecycle import issues: follow `terraform/security-groups.md`.
-- OIDC federation failures: follow `docs/github-setup/setup-federated-credentials.md` and verify issuer, audience, and subject values.
+- OIDC federation failures: follow `docs/runbooks/setup-federated-credentials.md` and verify issuer, audience, and subject values.
 - Drift issue noise: review the scheduled plan output in the workflow run and the `terraform-drift` issue comments.
 
 ## Protect the repository

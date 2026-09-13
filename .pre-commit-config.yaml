@@ -14,3 +14,10 @@ repos:
         language: system
         pass_filenames: false
         types: [terraform]
+
+      - id: terraform-graph
+        name: Terraform Graph
+        entry: bash -c 'cd terraform && terraform graph > terraform-graph.dot'
+        language: system
+        pass_filenames: false
+        types: [terraform]

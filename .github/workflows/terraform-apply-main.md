@@ -11,8 +11,10 @@ This workflow runs `terraform apply` when changes merge to `main`. It applies ap
 
 1. Calls the reusable [`terraform-run.yml`](terraform-run.yml) workflow with `command: apply` and `environment_name: production`, which gates the run behind the `production` environment's required reviewers.
 2. Adds the runner's current IP to the Terraform state storage account firewall.
-3. Runs `tflint`, `terraform fmt -check`, `terraform init`, `terraform validate`, `terraform plan -out=tfplan`, then `terraform apply tfplan` so the applied change matches the reviewed plan.
+3. Runs `tflint`, `terraform fmt -check`, `terraform init`, `terraform validate`, `terraform plan -out=tfplan`, then `terraform apply tfplan` so apply uses the plan generated in this job. This is not the PR plan artifact.
 4. Removes the runner IP from the storage account firewall.
+
+> Environment approval happens before this job generates its plan. It does not approve the exact plan produced later in this job.
 
 > **Note:** The `production` environment must have required reviewers configured in repository settings so a human approves the run before `terraform apply` executes. Ensure pull requests have a passing plan before merging to `main`.
 

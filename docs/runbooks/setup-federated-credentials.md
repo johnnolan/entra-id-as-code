@@ -39,7 +39,7 @@ Save these values from the app overview page:
 ## Step 2: Create federated identity credentials
 
 Add one credential for pull requests and one for main branch apply.  
-This separation improves least privilege and troubleshooting.
+These credentials distinguish workflow contexts; credentials on the same application share its permissions.
 
 1. Open your app registration.
 2. Go to **Certificates & secrets** > **Federated credentials**.
@@ -59,19 +59,26 @@ Expected subject identifier format:
 
 - `repo:johnnolan/entra-id-as-code:pull_request`
 
-### Credential B: merge to main apply
+### Credential B: production apply
 
 Set these fields:
 
 - Organization: `johnnolan`
 - Repository: `entra-id-as-code`
-- Entity type: **Branch**
-- GitHub branch name: `main`
+- Entity type: **Environment**
+- Environment name: `production`
 - Name: `github-main-apply`
 
 Expected subject identifier format:
 
-- `repo:johnnolan/entra-id-as-code:ref:refs/heads/main`
+- `repo:johnnolan/entra-id-as-code:environment:production`
+
+The apply job selects `production`, so its default subject includes the environment. Configure required reviewers and restrict deployment branches to `main` in GitHub.
+The workflow also supports manual dispatch; environment branch restrictions must enforce which refs may deploy.
+
+The examples use name-based subjects. Confirm your repository's actual subject format, including any immutable IDs or customization.
+See [GitHub OIDC subject guidance](https://docs.github.com/en/actions/reference/security/oidc#example-subject-claims).
+Scheduled drift and manual plan runs without an environment need a matching branch subject, such as `repo:johnnolan/entra-id-as-code:ref:refs/heads/main`.
 
 ### Verify issuer and audience
 
@@ -110,10 +117,14 @@ Assign RBAC (role-based access control, authorization by role assignment) so the
 4. Scope the role to the storage account or state container.
 5. Select the service principal for your app registration.
 
+The reusable workflow also adds and removes storage firewall rules. Blob data access alone does not authorize these management operations.
+Follow the [storage network runbook](storage-account-network-hardening.md) for the required access and scope.
+
 ## Step 5: Configure GitHub repository secrets
 
 In GitHub, go to **Settings** > **Secrets and variables** > **Actions**.  
-Add the secrets used by this repository workflows.
+Add the secrets used by this repository workflows. Plan callers inherit repository secrets without selecting an environment.
+Apply uses `production`, where environment secrets can provide a separate identity. Separate credentials on one application do not separate its permissions.
 
 - `ARM_CLIENT_ID`: Entra app client ID.
 - `ARM_TENANT_ID`: Entra tenant ID.
@@ -131,8 +142,8 @@ Check that workflow files include:
 
 ```yaml
 permissions:
-	id-token: write
-	contents: read
+  id-token: write
+  contents: read
 ```
 
 ## Step 7: Validate end-to-end
@@ -140,7 +151,7 @@ permissions:
 1. Open a pull request that changes Terraform files.
 2. Confirm the plan workflow completes successfully.
 3. Merge the pull request to main.
-4. Confirm the apply workflow completes successfully.
+4. Review and approve the waiting `production` deployment, then confirm the apply workflow completes successfully.
 
 ## Troubleshooting
 

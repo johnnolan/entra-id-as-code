@@ -1,3 +1,8 @@
+---
+name: terraform-outputs-permissions
+description: "Describes permission context for `terraform/outputs.tf`. Use this skill to document that this file exposes outputs only."
+---
+
 # terraform-outputs-permissions
 
 **Description:** Describes permission context for `terraform/outputs.tf`.

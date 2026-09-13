@@ -11,7 +11,8 @@ Read these project documents first:
 
 - [README.md](README.md)
 - [SECURITY.md](SECURITY.md)
-- [docs/github-setup/setup-federated-credentials.md](docs/github-setup/setup-federated-credentials.md)
+- [AGENTS.md](AGENTS.md)
+- [docs/runbooks/setup-federated-credentials.md](docs/runbooks/setup-federated-credentials.md)
 
 ## Prerequisites
 
@@ -45,15 +46,22 @@ Key files and folders:
 
 ## Local validation steps
 
-Run from the repository root:
+For documentation-only changes, check relative links and compare behavior descriptions with the source files.
+
+For Terraform changes, run static checks from the repository root:
 
 ```bash
+terraform -chdir=terraform fmt -check -recursive
+terraform -chdir=terraform init -backend=false -input=false
+terraform -chdir=terraform validate
 cd terraform
-terraform fmt -check -recursive
-terraform init -input=false
-terraform validate
-terraform plan -input=false -no-color
+tflint --init
+tflint -f compact
 ```
+
+Backend-disabled initialization can download providers but does not create a tenant plan. Use a clean checkout if existing backend initialization interferes.
+For an authorized tenant plan, follow [Run Terraform locally](README.md#run-terraform-locally) with the required backend configuration and authentication.
+Record static checks and live plan results separately. Explain missing tools, credentials, or network access rather than claiming unperformed checks passed.
 
 If your change manages existing singleton resources, confirm import blocks remain correct.
 
@@ -96,3 +104,19 @@ Prefer one logical change per commit.
 
 If you are unsure about a tenant-wide change, open a draft pull request early.  
 Use the draft to discuss permissions, blast radius, and rollback strategy before final review.
+
+## Maintain and verify agent guidance
+
+Keep shared expectations and file-to-skill routing in [AGENTS.md](AGENTS.md).
+Keep domain procedures in the linked skills and resource rationale in companion guides. Update these together when behavior changes.
+
+To check discovery after changing guidance:
+
+1. Start a fresh session in each supported agent client at the repository root.
+2. Ask: "Without editing files, list the repository instruction files you loaded and identify the guidance for reviewing Conditional Access."
+3. Check that it identifies `AGENTS.md`, the Conditional Access skill, and the companion guide.
+4. Ask for a review and check that it reports findings without making unrequested edits.
+5. If automatic discovery fails, explicitly provide `AGENTS.md` and confirm that the agent follows its links.
+
+For Copilot, also check that `.github/copilot-instructions.md` routes to the root guidance.
+Record the client and observed result when reporting a discovery check. Link validation alone does not prove client loading behavior.

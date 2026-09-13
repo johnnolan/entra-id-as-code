@@ -1,3 +1,8 @@
+---
+name: terraform-main-permissions
+description: "Describes permission context for `terraform/main.tf`. Use this skill to understand provider and backend configuration scope."
+---
+
 # terraform-main-permissions
 
 **Description:** Describes permission context for `terraform/main.tf`.

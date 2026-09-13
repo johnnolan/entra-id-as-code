@@ -1,3 +1,8 @@
+---
+name: terraform-policies-permissions
+description: "Lists Microsoft Graph application permissions required by `terraform/policies.tf`. Use this skill when validating or troubleshooting permissions for tenant policy resources."
+---
+
 # terraform-policies-permissions
 
 **Description:** Lists Microsoft Graph application permissions required by `terraform/policies.tf`.

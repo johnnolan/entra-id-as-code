@@ -1,3 +1,8 @@
+---
+name: terraform-security-groups-permissions
+description: "Lists Microsoft Graph application permissions required by `terraform/security-groups.tf`. Use this skill when validating or troubleshooting permissions for group lifecycle, group settings, and security group resources."
+---
+
 # terraform-security-groups-permissions
 
 **Description:** Lists Microsoft Graph application permissions required by `terraform/security-groups.tf`.

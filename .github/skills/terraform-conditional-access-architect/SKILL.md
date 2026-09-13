@@ -1,10 +1,11 @@
 ---
 name: terraform-conditional-access-architect
 description: Trigger when creating, reviewing, or modifying Conditional Access Terraform in terraform/conditional-access.tf; enforce break-glass exclusions, safe rollout states, and Microsoft plus NCSC baseline controls.
-compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread provider ~> 3.0
 ---
 
 # terraform-conditional-access-architect
+
+For Terraform edits, use Terraform and TFLint with the provider versions configured in [terraform/main.tf](../../../terraform/main.tf).
 
 ## When To Use
 - Apply this skill for any change to Conditional Access policy resources in terraform/conditional-access.tf.
@@ -28,10 +29,14 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 
 ## Mandatory Guardrails
 - Always exclude break-glass users via azuread_group.cap_excluded_from_conditional_access.object_id in conditions.users.excluded_groups.
-- Always retain depends_on for:
+- Preserve the existing baseline `depends_on` convention for:
 	azuread_group.cap_excluded_from_conditional_access,
 	azuread_named_location.named_location_restricted_signin,
 	msgraph_resource.security_defaults.
+  This repository orders baseline policy operations after the exclusion group, named location, and security-defaults resource.
+  Security-defaults ordering is a behavioral dependency that policy attribute references do not express.
+  Group and location references can already imply dependencies; their explicit inclusion is a repository convention, not a Terraform requirement.
+  Keep this convention for baseline additions. Review dependency simplification as a focused change with plan evidence.
 - Always keep security defaults disabled when Conditional Access baseline is in use (see msgraph_resource.security_defaults).
 - Never remove or narrow emergency-access exclusions without explicit human approval.
 - Require all new Conditional Access policies to start as enabledForReportingButNotEnforced (report-only behavior).
@@ -44,6 +49,11 @@ compatibility: Requires terraform, tflint, msgraph provider ~> 0.4, and azuread 
 	enforce MFA for all users and guests.
 - Minimize exclusions to break-glass scope only; do not add broad user, group, or app exclusions.
 - Use named location exclusions only for explicitly trusted locations; treat geo restrictions as deny-by-default.
+
+## Respect the requested scope
+
+For reviews, report findings without editing files. For requested implementation, follow [AGENTS.md](../../../AGENTS.md) and keep changes focused.
+Existing enabled policies are not automatically rolled back to report-only during review or unrelated edits. The new-policy rollout rules apply to newly created policies.
 
 ## Execution Rules
 - Follow resource naming pattern exactly: ca_<4digit>_<block|grant|session>_<purpose>.

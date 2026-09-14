@@ -39,11 +39,8 @@ resource "msgraph_resource" "authorization_policy" {
       allowedToReadBitlockerKeysForOwnedDevice = false
       # Prevents users from reading other users' profile information by default.
       allowedToReadOtherUsers = false
-      # Assigns only owned-resource permission-grant policies; omitting a ManagePermissionGrantsForSelf entry blocks user consent to applications (Maester MT.1006).
-      permissionGrantPoliciesAssigned = [
-        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
-        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
-      ]
+      # Empty list fully disables user consent to applications, including owned-resource consent, per CISA.MS.AAD.5.2 (Maester MT.1006).
+      permissionGrantPoliciesAssigned = []
     }
     # Assigns the Restricted Guest role template so guests have the least privileged default access.
     guestUserRoleId = "2af84b1e-32c8-42b7-82bc-daa82404023b" # RestrictedGuest role template id

@@ -275,6 +275,37 @@ resource "azuread_conditional_access_policy" "ca_1110_block_o365_insider_risk" {
   }
 }
 
+# MT.1011: blocks registering security info (MFA/passwordless methods) from outside the trusted location.
+resource "azuread_conditional_access_policy" "ca_1120_block_security_info_registration_untrusted_locations" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 1120 - BLOCK - Security Info Registration from Untrusted Locations"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_user_actions = ["urn:user:registersecurityinfo"]
+    }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+    }
+    locations {
+      included_locations = ["All"]
+      excluded_locations = [azuread_named_location.named_location_restricted_signin.object_id]
+    }
+  }
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
+  }
+}
+
 resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins" {
   depends_on = [
     azuread_group.cap_excluded_from_conditional_access,

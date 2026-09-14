@@ -5,6 +5,7 @@ This guide covers the Azure AD security group resources in [terraform/security-g
 - `azuread_group.cap_excluded_from_conditional_access`
 - `azuread_group.sec_guest_users`
 - `azuread_group.ap_example_users`
+- `azuread_group.sec_admin_consent_reviewers`
 
 These are normal Entra security groups and dynamic membership groups, not the Graph group lifecycle or group settings policies.
 
@@ -13,6 +14,7 @@ These are normal Entra security groups and dynamic membership groups, not the Gr
 - `cap_excluded_from_conditional_access` creates a security group used to exclude users from Conditional Access policies.
 - `sec_guest_users` creates a dynamic group containing guest users only, which is useful for scoping authentication methods or access controls.
 - `ap_example_users` creates an example entitlement group for access package testing or demonstration scenarios.
+- `sec_admin_consent_reviewers` creates a security group whose members review and adjudicate admin consent requests for applications (see `admin_consent_request_policy` in [policies.tf](policies.tf)).
 
 These resources can be created from scratch and imported by object ID only if they already exist in the tenant.
 
@@ -24,6 +26,7 @@ To adopt an existing Azure AD group in Terraform, get the object ID and run:
 az ad group list --group "CAP-Excluded from Conditional Access" --query "[0].id" -o tsv
 az ad group list --group "SEC-Guest Users" --query "[0].id" -o tsv
 az ad group list --group "AP-Example Users" --query "[0].id" -o tsv
+az ad group list --group "SEC-Admin Consent Reviewers" --query "[0].id" -o tsv
 ```
 
 Then import them:
@@ -32,6 +35,7 @@ Then import them:
 terraform import azuread_group.cap_excluded_from_conditional_access <GROUP_OBJECT_ID>
 terraform import azuread_group.sec_guest_users <GROUP_OBJECT_ID>
 terraform import azuread_group.ap_example_users <GROUP_OBJECT_ID>
+terraform import azuread_group.sec_admin_consent_reviewers <GROUP_OBJECT_ID>
 ```
 
 ## Terraform behavior in this repository

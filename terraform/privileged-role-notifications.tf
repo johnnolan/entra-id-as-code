@@ -71,46 +71,18 @@ import {
   id       = "policies/roleManagementPolicies/${data.msgraph_resource.role_management_policy_assignment[each.key].output.policy_id}/rules/Notification_Admin_EndUser_Assignment"
 }
 
-# CISA.MS.AAD.7.7: alerts on active (permanent/direct) role assignment, distinct from activating an eligible assignment.
-resource "msgraph_resource" "role_active_assignment_alert" {
-  for_each = local.pim_role_activation_alert_roles
-
-  url = "policies/roleManagementPolicies/${data.msgraph_resource.role_management_policy_assignment[each.key].output.policy_id}/rules"
-  body = {
-    "@odata.type"              = "#microsoft.graph.unifiedRoleManagementPolicyNotificationRule"
-    id                         = "Notification_Admin_Admin_Assignment"
-    notificationType           = "Email"
-    recipientType              = "Admin"
-    notificationLevel          = "All"
-    isDefaultRecipientsEnabled = true
-    notificationRecipients     = each.value.recipients
+# CISA.MS.AAD.7.7: rolled back. Graph rejects updates to Notification_Admin_Admin_Assignment/Eligibility
+# with "InvalidPolicyRuleProperty" regardless of body shape; needs further investigation before retrying.
+removed {
+  from = msgraph_resource.role_active_assignment_alert
+  lifecycle {
+    destroy = false
   }
 }
 
-import {
-  for_each = local.pim_role_activation_alert_roles
-  to       = msgraph_resource.role_active_assignment_alert[each.key]
-  id       = "policies/roleManagementPolicies/${data.msgraph_resource.role_management_policy_assignment[each.key].output.policy_id}/rules/Notification_Admin_Admin_Assignment"
-}
-
-# CISA.MS.AAD.7.7: alerts when a user is made eligible for a role, the other half of the "eligible and active" requirement.
-resource "msgraph_resource" "role_eligible_assignment_alert" {
-  for_each = local.pim_role_activation_alert_roles
-
-  url = "policies/roleManagementPolicies/${data.msgraph_resource.role_management_policy_assignment[each.key].output.policy_id}/rules"
-  body = {
-    "@odata.type"              = "#microsoft.graph.unifiedRoleManagementPolicyNotificationRule"
-    id                         = "Notification_Admin_Admin_Eligibility"
-    notificationType           = "Email"
-    recipientType              = "Admin"
-    notificationLevel          = "All"
-    isDefaultRecipientsEnabled = true
-    notificationRecipients     = each.value.recipients
+removed {
+  from = msgraph_resource.role_eligible_assignment_alert
+  lifecycle {
+    destroy = false
   }
-}
-
-import {
-  for_each = local.pim_role_activation_alert_roles
-  to       = msgraph_resource.role_eligible_assignment_alert[each.key]
-  id       = "policies/roleManagementPolicies/${data.msgraph_resource.role_management_policy_assignment[each.key].output.policy_id}/rules/Notification_Admin_Admin_Eligibility"
 }

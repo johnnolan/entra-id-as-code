@@ -275,18 +275,50 @@ resource "azuread_conditional_access_policy" "ca_1110_block_o365_insider_risk" {
   }
 }
 
+# MT.1011: blocks registering security info (MFA/passwordless methods) from outside the trusted location.
+resource "azuread_conditional_access_policy" "ca_1120_block_security_info_registration_untrusted_locations" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 1120 - BLOCK - Security Info Registration from Untrusted Locations"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_user_actions = ["urn:user:registersecurityinfo"]
+    }
+    users {
+      included_users  = ["All"]
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
+    }
+    locations {
+      included_locations = ["All"]
+      excluded_locations = [azuread_named_location.named_location_restricted_signin.object_id]
+    }
+  }
+
+  grant_controls {
+    operator          = "OR"
+    built_in_controls = ["block"]
+  }
+}
+
 resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins" {
   depends_on = [
     azuread_group.cap_excluded_from_conditional_access,
     azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  display_name = "GLOBAL - 2010 - GRANT - Medium-Risk Sign-Ins"
+  display_name = "GLOBAL - 2010 - GRANT - Medium and High-Risk Sign-Ins"
   state        = "enabled"
 
   conditions {
-    client_app_types    = ["all"]
-    sign_in_risk_levels = ["medium"]
+    client_app_types = ["all"]
+    # Includes "high" alongside "medium" for MT.1012; ca_1090 already blocks high-risk sign-ins outright, so this grant is a redundant backstop, not a loosening.
+    sign_in_risk_levels = ["medium", "high"]
     applications {
       included_applications = ["All"]
     }
@@ -334,6 +366,34 @@ resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
 
   session_controls {
     sign_in_frequency_interval = "everyTime"
+  }
+}
+
+# MT.1013: requires a self-remediating password change (plus MFA) for high user risk; ca_1100 still blocks the same condition outright.
+resource "azuread_conditional_access_policy" "ca_2025_grant_password_change_high_risk_users" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 2025 - GRANT - Password Change for High-Risk Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    user_risk_levels = ["high"]
+    applications {
+      included_applications = ["All"]
+    }
+    # Break-glass accounts are not excluded so they remain subject to this requirement.
+    users {
+      included_users = ["All"]
+    }
+  }
+
+  grant_controls {
+    operator          = "AND"
+    built_in_controls = ["mfa", "passwordChange"]
   }
 }
 

@@ -1,6 +1,6 @@
 # Privileged role activation notifications
 
-This file configures three Privileged Identity Management (PIM) notification rules for Global Administrator and seven other highly privileged built-in directory roles: activation of an eligible assignment, active (direct) assignment, and eligible assignment, so a security monitoring mailbox is notified for each.
+This file configures the Privileged Identity Management (PIM) **Role activation alert** notification rule for Global Administrator and seven other highly privileged built-in directory roles, so a security monitoring mailbox is notified whenever a user activates an eligible assignment.
 
 ## `role_management_policy_assignment` (data source)
 
@@ -14,9 +14,9 @@ Updates the built-in `Notification_Admin_EndUser_Assignment` rule on each role's
 - `isDefaultRecipientsEnabled = true` keeps Microsoft's built-in default recipients (the role's active admins) in addition to the custom mailbox.
 - `notificationRecipients` is supplied per role from `var.pim_global_admin_activation_alert_recipients` (Global Administrator) or `var.pim_privileged_role_activation_alert_recipients` (the other seven roles) — kept as separate variables because the remediation guidance calls for a distinct monitoring mailbox for Global Administrator activations.
 
-## `role_active_assignment_alert` and `role_eligible_assignment_alert`
+## CISA.MS.AAD.7.7 (rolled back)
 
-Update the built-in `Notification_Admin_Admin_Assignment` and `Notification_Admin_Admin_Eligibility` rules — shown in the admin center as the **Role assignment alert** settings for active and eligible assignments respectively. Required for CISA.MS.AAD.7.7 ("Eligible and Active highly privileged role assignments SHALL trigger an alert"), which checks both rules independently of the activation alert above. Same recipient/permission shape as `role_activation_alert`.
+An attempt was made to also manage `Notification_Admin_Admin_Assignment` and `Notification_Admin_Admin_Eligibility` (the **Role assignment alert** rules for active and eligible assignments) to satisfy CISA.MS.AAD.7.7. Microsoft Graph rejected every update with `InvalidPolicyRuleProperty` on `recipientType`, regardless of whether that field was included in the request body. The resources were removed via `removed` blocks (not deleted from the tenant) pending further investigation into the correct request shape for these two rule IDs.
 
 ### Covered roles
 
@@ -35,7 +35,7 @@ Template IDs are Microsoft's fixed identifiers for built-in roles and are stable
 
 ## Import
 
-Each role's three rules are adopted via `import` blocks binding `msgraph_resource.role_activation_alert[each.key]`, `msgraph_resource.role_active_assignment_alert[each.key]`, and `msgraph_resource.role_eligible_assignment_alert[each.key]` to their respective existing rules at `policies/roleManagementPolicies/<policy_id>/rules/<rule_id>`. These rules always exist as part of the built-in policy, so Terraform must adopt them rather than create them.
+The `import` block binds each `msgraph_resource.role_activation_alert[each.key]` to the existing rule at `policies/roleManagementPolicies/<policy_id>/rules/Notification_Admin_EndUser_Assignment`. This rule always exists as part of the built-in policy, so Terraform must adopt it rather than create it.
 
 ## Required permissions
 
@@ -46,7 +46,7 @@ The Terraform service principal needs the Microsoft Graph application permission
 
 ## Maester coverage
 
-- [CISA.MS.AAD.7.7 — Eligible and Active highly privileged role assignments SHALL trigger an alert](https://maester.dev/docs/tests/CISA.MS.AAD.7.7) — validated by `role_active_assignment_alert` and `role_eligible_assignment_alert` across all eight role entries.
+- [CISA.MS.AAD.7.7 — Eligible and Active highly privileged role assignments SHALL trigger an alert](https://maester.dev/docs/tests/CISA.MS.AAD.7.7) — not currently satisfied; see the rollback note above.
 - [CISA.MS.AAD.7.8 — User activation of the Global Administrator role SHALL trigger an alert](https://maester.dev/docs/tests/CISA.MS.AAD.7.8) — validated by the `global_administrator` entry in `pim_role_activation_alert_roles`.
 - [CISA.MS.AAD.7.9 — User activation of other highly privileged roles SHOULD trigger an alert](https://maester.dev/docs/tests/CISA.MS.AAD.7.9) — validated by the remaining seven role entries.
 

@@ -56,6 +56,8 @@ import {
 resource "msgraph_resource" "admin_consent_request_policy" {
   depends_on = [azuread_group.sec_admin_consent_reviewers]
   url        = "policies"
+  # Graph only supports PUT (full replace) for this singleton; PATCH (the provider default) 404s.
+  update_method = "PUT"
   body = {
     # Lets users request admin consent for apps they cannot consent to themselves (CISA.MS.AAD.5.3).
     isEnabled = true

@@ -52,6 +52,33 @@ import {
   id = "policies/authorizationPolicy"
 }
 
+# Microsoft Graph Application Permission: Policy.ReadWrite.ConsentRequest
+resource "msgraph_resource" "admin_consent_request_policy" {
+  depends_on = [azuread_group.sec_admin_consent_reviewers]
+  url        = "policies"
+  body = {
+    # Lets users request admin consent for apps they cannot consent to themselves (CISA.MS.AAD.5.3).
+    isEnabled = true
+    # Notifies reviewers by email when a new consent request is submitted.
+    notifyReviewers = true
+    # Sends reminder emails to reviewers while a request is still pending.
+    remindersEnabled = true
+    # Expires unreviewed requests after 30 days so they don't accumulate indefinitely.
+    requestDurationInDays = 30
+    reviewers = [
+      {
+        query     = "/groups/${azuread_group.sec_admin_consent_reviewers.object_id}/transitiveMembers"
+        queryType = "MicrosoftGraph"
+      }
+    ]
+  }
+}
+
+import {
+  to = msgraph_resource.admin_consent_request_policy
+  id = "policies/adminConsentRequestPolicy"
+}
+
 # Microsoft Graph Application Permission: Policy.ReadWrite.ExternalIdentities
 resource "msgraph_resource" "external_identity_policy" {
   url         = "policies"

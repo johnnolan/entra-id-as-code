@@ -34,3 +34,13 @@ resource "azuread_group" "ap_example_users" {
   mail_enabled     = false
   mail_nickname    = "APExampleUsers"
 }
+
+# Microsoft Graph Application Permission: Group.ReadWrite.All
+resource "azuread_group" "sec_admin_consent_reviewers" {
+  display_name     = "SEC-Admin Consent Reviewers"
+  description      = "Reviews and adjudicates admin consent requests for applications (CISA.MS.AAD.5.3)."
+  security_enabled = true
+  mail_enabled     = false
+  mail_nickname    = "SECAdminConsentReviewers"
+  types            = []
+}

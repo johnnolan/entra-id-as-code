@@ -18,8 +18,8 @@ resource "msgraph_resource" "auth_method_policy_authenticator" {
     "@odata.type" = "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration"
     # Enables the Microsoft Authenticator method for users in the tenant.
     state = "enabled"
-    # Allows the software OATH token method to be used alongside Microsoft Authenticator where supported.
-    isSoftwareOathEnabled = true
+    # Disables Microsoft Authenticator-generated software OATH codes so sign-ins use methods that can show login context.
+    isSoftwareOathEnabled = false
     # Applies the configuration to all users so the method is available to the organization by default.
     includeTargets = [
       {

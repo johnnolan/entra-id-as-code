@@ -126,6 +126,9 @@ resource "msgraph_resource" "auth_method_policy_fido2" {
         "7409272d-1ff9-4e10-9fc9-ac0019c124fd", #YubiKey Bio - FIDO Edition 5.7
         "de1e552d-db1d-4423-a619-566b625cdc84", #Microsoft Authenticator for Android
         "90a3ccdf-635c-4729-a248-9b709135078f", #Microsoft Authenticator for iOS
+        "6d44ba9b-f6ec-2e49-b930-0c8fe920cb73", # Firmware 5.1
+        "149a2021-8ef6-4133-96b8-81f8d5b7f1f5", # Firmware 5.2 / some 5.4
+        "a4e9fc6d-4cbe-4758-b8ba-37598bb5bbaa"  # Firmware 5.4
       ]
     }
   }

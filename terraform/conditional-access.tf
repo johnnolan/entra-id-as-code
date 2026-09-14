@@ -464,6 +464,7 @@ resource "azuread_conditional_access_policy" "ca_2060_grant_phishing_resistant_m
           membership_kind = "all"
         }
       }
+      excluded_groups = [azuread_group.cap_excluded_from_conditional_access.object_id]
     }
   }
 

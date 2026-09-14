@@ -26,16 +26,6 @@ Configures the tenant's authorization policy (`policies/authorizationPolicy`) �
   - `permissionGrantPoliciesAssigned` — set to an empty list, which Microsoft Graph treats as fully disabling user consent to applications (including owned-resource consent for Teams/chat dynamically-managed permissions). Required for CISA.MS.AAD.5.2 ("Do not allow user consent") and blocks user consent grant attacks (Maester MT.1006). Admins must grant Teams/chat app permissions on users' behalf if needed.
 - `guestUserRoleId` — set to the built-in **Restricted Guest User** role template ID, so guests get the most limited directory visibility by default.
 
-## `admin_consent_request_policy`
-
-Configures the tenant's admin consent request workflow (`policies/adminConsentRequestPolicy`).
-
-- `isEnabled = true` — lets users request admin consent for apps they can't consent to themselves, instead of being blocked outright. Required for CISA.MS.AAD.5.3.
-- `notifyReviewers = true` and `remindersEnabled = true` — reviewers are emailed when a request comes in and reminded while it's pending.
-- `requestDurationInDays = 30` — unreviewed requests expire after 30 days rather than accumulating indefinitely.
-- `reviewers` — a `MicrosoftGraph` query over the transitive members of `azuread_group.sec_admin_consent_reviewers` (see [security-groups.tf](security-groups.tf)), so reviewer membership is managed via that group rather than hardcoded user IDs. Populate its members outside this resource — group membership isn't managed here.
-- `depends_on = [azuread_group.sec_admin_consent_reviewers]` — ensures the reviewer group exists before Terraform references its object ID.
-
 ## `external_identity_policy`
 
 Configures the tenant's external identities policy (`policies/externalIdentitiesPolicy`, beta).

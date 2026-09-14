@@ -369,6 +369,34 @@ resource "azuread_conditional_access_policy" "ca_2020_grant_medium_risk_users" {
   }
 }
 
+# MT.1013: requires a self-remediating password change (plus MFA) for high user risk; ca_1100 still blocks the same condition outright.
+resource "azuread_conditional_access_policy" "ca_2025_grant_password_change_high_risk_users" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 2025 - GRANT - Password Change for High-Risk Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    user_risk_levels = ["high"]
+    applications {
+      included_applications = ["All"]
+    }
+    # Break-glass accounts are not excluded so they remain subject to this requirement.
+    users {
+      included_users = ["All"]
+    }
+  }
+
+  grant_controls {
+    operator          = "AND"
+    built_in_controls = ["mfa", "passwordChange"]
+  }
+}
+
 resource "azuread_conditional_access_policy" "ca_2050_grant_mfa_all_users" {
   depends_on = [
     azuread_group.cap_excluded_from_conditional_access,

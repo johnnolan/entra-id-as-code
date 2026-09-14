@@ -312,12 +312,13 @@ resource "azuread_conditional_access_policy" "ca_2010_grant_medium_risk_signins"
     azuread_named_location.named_location_restricted_signin,
     msgraph_resource.security_defaults
   ]
-  display_name = "GLOBAL - 2010 - GRANT - Medium-Risk Sign-Ins"
+  display_name = "GLOBAL - 2010 - GRANT - Medium and High-Risk Sign-Ins"
   state        = "enabled"
 
   conditions {
-    client_app_types    = ["all"]
-    sign_in_risk_levels = ["medium"]
+    client_app_types = ["all"]
+    # Includes "high" alongside "medium" for MT.1012; ca_1090 already blocks high-risk sign-ins outright, so this grant is a redundant backstop, not a loosening.
+    sign_in_risk_levels = ["medium", "high"]
     applications {
       included_applications = ["All"]
     }

@@ -13,7 +13,8 @@ Renovate manages dependency updates for the repository using a configuration des
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "helpers:pinGitHubActionDigests"
+    "helpers:pinGitHubActionDigests",
+    ":enableVulnerabilityAlerts"
   ],
   "enabledManagers": [
     "terraform",
@@ -39,6 +40,13 @@ Renovate manages dependency updates for the repository using a configuration des
 The repository extends the Renovate `config:recommended` preset, which applies the baseline best-practice settings for dependency management. It also enables the `helpers:pinGitHubActionDigests` helper to pin GitHub Actions to immutable digests instead of floating tag references.
 
 This is useful for security and reproducibility because it reduces the chance of unexpected upstream changes affecting the workflow environment.
+
+### Vulnerability alerts
+
+The `:enableVulnerabilityAlerts` preset lets Renovate create pull requests for vulnerable dependencies reported by GitHub Dependabot alerts. Renovate uses the GitHub alert data; it does not need Dependabot version updates.
+
+> [!IMPORTANT]
+> Enable Dependabot alerts in the repository's GitHub security settings. Authorise the Renovate GitHub App to read Dependabot alerts. Renovate cannot create a security fix pull request without an alert and access to it.
 
 ### Manager scope
 

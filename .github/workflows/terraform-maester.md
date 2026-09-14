@@ -25,16 +25,34 @@ This workflow runs the [Maester](https://maester.dev) security test suite daily 
 | `include_teams` | `false` |
 | `maester_version` | `latest` |
 | `include_tags` | `Entra,CA,App,Privileged,Authentication,Governance,Group,General,Entra ID Free,Entra ID P1,Entra ID P2` |
-| `exclude_tags` | `Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange` |
+| `exclude_tags` | `Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange,insiderRiskPolicy,MT.1019,CISA.MS.AAD.3.7,CISA.MS.AAD.3.8,MT.1014` |
 
 ### Scope the test run to Entra ID
 
 The `include_tags` and `exclude_tags` inputs filter which Maester tests run. Maester tags each test with the Microsoft product area it checks (for example `CA` for Conditional Access, or `Intune` for device management).
 
 - `include_tags` allows only tests tagged with an Entra ID area: Conditional Access (`CA`), app registrations (`App`), privileged role management (`Privileged`), authentication methods (`Authentication`), entitlement management (`Governance`), groups (`Group`), and the Entra ID Security Config Analyzer checks (`General`), plus the CISA Entra ID baseline license tiers (`Entra ID Free`, `Entra ID P1`, `Entra ID P2`).
-- `exclude_tags` blocks tests for other Microsoft 365 products, even if they'd otherwise match an include tag, so Exchange Online, Teams, Intune, Defender, Purview, Azure, Backup, and AI agent tests never run.
+- `exclude_tags` blocks tests carrying the listed service tags, even when they also match an include tag.
 
-> **Note:** Maester's tagging can't guarantee a perfectly pure Entra ID-only test set. Some CIS benchmark tests share a broad `CIS M365` tag across multiple products. This configuration excludes those to stay strictly within Entra ID scope.
+> **Note:** Tags cannot guarantee an Entra ID-only test set. Tests tagged only `CIS M365` do not match the include list. Tests with additional matching tags can still run unless an exclusion matches.
+
+### Exclude checks for unused services
+
+Some checks carry Entra or Conditional Access tags without the service tags they depend on. The workflow excludes these individual tags:
+
+| Excluded tag | Reason |
+|---|---|
+| `insiderRiskPolicy` | Microsoft Purview Adaptive Protection is outside scope. |
+| `MT.1019` | Application enforced restrictions for Microsoft 365 workloads are outside scope. |
+| `CISA.MS.AAD.3.7` | Device compliance for authentication is outside scope. |
+| `CISA.MS.AAD.3.8` | Device compliance for multifactor authentication (MFA) registration is outside scope. |
+| `MT.1014` | Compliant or Entra hybrid-joined devices for administrators are outside scope. |
+
+These exclusions assume no device compliance service or Entra hybrid-joined devices. Remove the relevant exclusions if those capabilities enter scope.
+Microsoft documents the dependencies for [Insider Risk](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/recommendation-insider-risk-condition), [application enforced restrictions](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-session#application-enforced-restrictions), and [device grant controls](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-grant).
+
+The `insiderRiskPolicy` tag excludes only that recommendation. Other `MT.1024` recommendations remain eligible to run.
+Exclusions change test coverage; they do not change tenant policies or close existing GitHub issues.
 
 ## File issues for failed tests
 

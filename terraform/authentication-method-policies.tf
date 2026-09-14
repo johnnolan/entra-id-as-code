@@ -18,8 +18,8 @@ resource "msgraph_resource" "auth_method_policy_authenticator" {
     "@odata.type" = "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration"
     # Enables the Microsoft Authenticator method for users in the tenant.
     state = "enabled"
-    # Allows the software OATH token method to be used alongside Microsoft Authenticator where supported.
-    isSoftwareOathEnabled = true
+    # Disables Microsoft Authenticator-generated software OATH codes so sign-ins use methods that can show login context.
+    isSoftwareOathEnabled = false
     # Applies the configuration to all users so the method is available to the organization by default.
     includeTargets = [
       {
@@ -64,11 +64,11 @@ resource "msgraph_resource" "auth_method_policy_email" {
   body = {
     # Identifies this configuration as the email OTP authentication method in Entra.
     "@odata.type" = "#microsoft.graph.emailAuthenticationMethodConfiguration"
-    # Enables email-based verification as an available authentication method.
+    # Disabled tenant-wide, including for guests/SSPR, per CISA.MS.AAD.3.5.
     state = "disabled"
-    # Allows external identities to use email one-time passcodes for secure sign-in.
+    # Blocks external identities from using email one-time passcodes for sign-in.
     allowExternalIdToUseEmailOtp = "disabled"
-    # Limits email OTP availability to the guest security group so it is targeted to approved users.
+    # Retains the guest group as includeTargets for audit history; state=disabled overrides scoping.
     includeTargets = [
       { id = azuread_group.sec_guest_users.object_id, targetType = "group" }
     ]

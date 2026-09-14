@@ -33,7 +33,7 @@ jobs:
           artifact_upload_html: true
           pester_verbosity: Detailed
           include_tags: "Entra,CA,App,Privileged,Authentication,Governance,Group,General,Entra ID Free,Entra ID P1,Entra ID P2"
-          exclude_tags: "Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange"
+          exclude_tags: "Exchange,EXO,Teams,Intune,Defender,Purview,Azure,Backup,XSPM,AIAgent,spo,exchange,insiderRiskPolicy,MT.1019,CISA.MS.AAD.3.7,CISA.MS.AAD.3.8,MT.1014"
 
       - name: File issues for failed tests 🐛
         if: always() && steps.maester.outputs.results_json != '' && steps.maester.outputs.tests_failed != '0'

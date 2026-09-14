@@ -20,7 +20,7 @@ Configures the top-level Authentication Methods Policy itself (`policies/authent
 Configures the Microsoft Authenticator app as a passwordless and MFA method.
 
 - `state = "enabled"` — all users can register and use the Authenticator app.
-- `isSoftwareOathEnabled = true` — lets Authenticator generate software OATH (Open Authentication) one-time codes as a fallback when push notifications aren't available.
+- `isSoftwareOathEnabled = false` — prevents Microsoft Authenticator from generating software OATH (Open Authentication) one-time codes. These codes do not show application or location context, so disabling them is required by CISA.MS.AAD.3.3 and removes this fallback for affected users.
 - `featureSettings` — hardens the push-notification prompt so it resists MFA fatigue attacks (where an attacker spams approval requests until a user accepts by mistake):
   - `displayLocationInformationRequiredState = "enabled"` — shows the sign-in's approximate location in the prompt.
   - `displayAppInformationRequiredState = "enabled"` — shows which application is requesting the sign-in.
@@ -31,9 +31,10 @@ Configures the Microsoft Authenticator app as a passwordless and MFA method.
 
 Configures Email one-time passcode (OTP) sign-in.
 
-- `state = "enabled"` combined with `includeTargets = [{ id = azuread_group.sec_guest_users.object_id, ... }]` restricts Email OTP registration to the `sec_guest_users` dynamic group (see [security-groups.tf](security-groups.tf)), not `all_users`.
-- **Why guests only:** Microsoft's guidance treats Email OTP as intended for guest and self-service password reset (SSPR) scenarios, not general workforce MFA — it's weaker than app-based or hardware-based methods and more susceptible to phishing.
-- `allowExternalIdToUseEmailOtp = "enabled"` — lets external (B2B/B2C) identities use Email OTP for sign-in, independent of the guest group scoping above.
+- `state = "disabled"` — Email OTP is disabled tenant-wide, including for guests and SSPR, per CISA.MS.AAD.3.5.
+- `allowExternalIdToUseEmailOtp = "disabled"` — blocks external (B2B/B2C) identities from using Email OTP for sign-in, independent of the scoping below.
+- `includeTargets` still references the `sec_guest_users` dynamic group (see [security-groups.tf](security-groups.tf)) for audit history, but `state = "disabled"` overrides that scoping tenant-wide.
+- **Why disabled:** Microsoft's guidance treats Email OTP as weaker than app-based or hardware-based methods and more susceptible to phishing; CISA guidance requires it be disabled outright rather than scoped to guests only.
 - `depends_on = [azuread_group.sec_guest_users]` — ensures the guest group exists before Terraform references its object ID.
 
 ## `auth_method_policy_sms`
@@ -115,6 +116,7 @@ Every resource above has a matching `import` block that maps it to its fixed Mic
 - [EIDSCA.AT02 — Authentication Method - Temporary Access Pass - One-time](https://maester.dev/docs/tests/EIDSCA.AT02) — confirms `isUsableOnce = true`.
 - [EIDSCA.AM01 — Authentication Method - Microsoft Authenticator - State](https://maester.dev/docs/tests/EIDSCA.AM01) — confirms `auth_method_policy_authenticator.state` stays `enabled`.
 - [EIDSCA.AM09 — Authentication Method - Microsoft Authenticator - Show geographic location](https://maester.dev/docs/tests/EIDSCA.AM09) — confirms `displayLocationInformationRequiredState = "enabled"`.
+- [CISA.MS.AAD.3.3 — Microsoft Authenticator login context](https://maester.dev/docs/tests/CISA.MS.AAD.3.3) — confirms Authenticator is enabled for all users, software OATH is disabled, and application and location context are enabled for all users.
 - [CISA.MS.AAD.3.5 — SMS, Voice Call, and Email OTP SHALL be disabled](https://maester.dev/docs/tests/CISA.MS.AAD.3.5) — covers `auth_method_policy_sms` and `auth_method_policy_voice`; note this tenant keeps Email OTP enabled but scoped to guests only, which is a deliberate deviation documented above.
 - [CISA.MS.AAD.3.6 — Phishing-resistant MFA SHALL be required for highly privileged roles](https://maester.dev/docs/tests/CISA.MS.AAD.3.6) — validated at the Conditional Access layer, not here; see `ca_2055_grant_phishing_resistant_mfa_admins` in [conditional-access.tf](conditional-access.tf).
 - [MT.1067 — Authentication methods policies should not reference deleted groups](https://maester.dev/docs/tests/MT.1067) — relevant because `auth_method_policy_email` targets the `sec_guest_users` group; deleting that group without updating the policy would fail this test.
@@ -125,4 +127,3 @@ Every resource above has a matching `import` block that maps it to its fixed Mic
 - [NCSC — Multi-factor authentication for online services](https://www.ncsc.gov.uk/guidance/multi-factor-authentication-for-your-corporate-services) — baseline MFA guidance referenced by the CISA/Maester MFA checks above.
 - [NCSC — Authentication methods and phishing resistance](https://www.ncsc.gov.uk/blog-post/authentication-methods-and-phishing-resistance) — justifies preferring FIDO2/CBA over SMS, voice, and OTP methods for privileged and general users alike.
 - [NCSC Zero Trust Architecture — Principle 3: User identity](https://www.ncsc.gov.uk/guidance/zero-trust-architecture-point-3) — supports scoping weaker methods (Email OTP) away from the general workforce and toward guest/external identities only.
-

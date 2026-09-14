@@ -427,6 +427,39 @@ resource "azuread_conditional_access_policy" "ca_2055_grant_phishing_resistant_m
   }
 }
 
+# CISA.MS.AAD.3.1: enforced; all users confirmed enrolled with Authenticator passkeys.
+resource "azuread_conditional_access_policy" "ca_2060_grant_phishing_resistant_mfa_all_users" {
+  depends_on = [
+    azuread_group.cap_excluded_from_conditional_access,
+    azuread_named_location.named_location_restricted_signin,
+    msgraph_resource.security_defaults
+  ]
+  display_name = "GLOBAL - 2060 - GRANT - Phishing Resistant MFA for All Users"
+  state        = "enabled"
+
+  conditions {
+    client_app_types = ["all"]
+    applications {
+      included_applications = ["All"]
+    }
+    # Break-glass accounts are not excluded so they remain subject to this MFA requirement.
+    users {
+      included_users = ["All"]
+      excluded_guests_or_external_users {
+        guest_or_external_user_types = ["internalGuest", "b2bCollaborationGuest", "b2bCollaborationMember", "b2bDirectConnectUser", "otherExternalUser", "serviceProvider"]
+        external_tenants {
+          membership_kind = "all"
+        }
+      }
+    }
+  }
+
+  grant_controls {
+    operator                          = "OR"
+    authentication_strength_policy_id = azuread_authentication_strength_policy.phishing_resistant_mfa.id
+  }
+}
+
 resource "azuread_conditional_access_policy" "ca_3020_session_guest_persistent_browser" {
   depends_on = [
     azuread_group.cap_excluded_from_conditional_access,

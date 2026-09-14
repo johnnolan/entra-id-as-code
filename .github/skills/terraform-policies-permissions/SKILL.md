@@ -30,7 +30,6 @@ Use an AzureAD typed resource where it supports the required policy. Use `msgrap
 - `msgraph_resource.authentication_flow_policy`
 - `msgraph_resource.authorization_policy`
 - `msgraph_resource.external_identity_policy`
-- `msgraph_resource.admin_consent_request_policy`
 - `msgraph_resource.b2b_management_policy`
 - `msgraph_resource.security_defaults`
 - `azuread_authentication_strength_policy.default_mfa`

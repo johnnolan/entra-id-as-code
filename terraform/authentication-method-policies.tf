@@ -106,8 +106,8 @@ resource "msgraph_resource" "auth_method_policy_fido2" {
     "@odata.type" = "#microsoft.graph.fido2AuthenticationMethodConfiguration"
     # Enables FIDO2 security keys as a valid login method for users.
     state = "enabled"
-    # Requires attestation to validate the security key's authenticity before registration is accepted.
-    isAttestationEnforced = true
+    # Disabled: attestation was blocking registered Microsoft Authenticator passkeys from being offered at sign-in.
+    isAttestationEnforced = false
     # Allows users to self-register FIDO2 keys to improve the user experience without manual admin enrollment.
     isSelfServiceRegistrationAllowed = true
     # Applies the policy to all users so the method is available to the organization by default.

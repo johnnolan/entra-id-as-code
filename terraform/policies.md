@@ -23,7 +23,7 @@ Configures the tenant's authorization policy (`policies/authorizationPolicy`) �
   - `allowedToCreateApps = false`, `allowedToCreateSecurityGroups = false`, `allowedToCreateTenants = false` — non-admins can't create apps, security groups, or new tenants.
   - `allowedToReadBitlockerKeysForOwnedDevice = false` — users can't self-service read their own device's BitLocker recovery key; recovery goes through the help desk.
   - `allowedToReadOtherUsers = false` — restricts the directory-wide read of other users' profiles.
-  - `permissionGrantPoliciesAssigned` — omits any `ManagePermissionGrantsForSelf` entry, so users cannot consent to application permissions themselves; only owned-resource consent for Teams/chat dynamically-managed permissions remains. This blocks user consent grant attacks (Maester MT.1006).
+  - `permissionGrantPoliciesAssigned` — set to an empty list, which Microsoft Graph treats as fully disabling user consent to applications (including owned-resource consent for Teams/chat dynamically-managed permissions). Required for CISA.MS.AAD.5.2 ("Do not allow user consent") and blocks user consent grant attacks (Maester MT.1006). Admins must grant Teams/chat app permissions on users' behalf if needed.
 - `guestUserRoleId` — set to the built-in **Restricted Guest User** role template ID, so guests get the most limited directory visibility by default.
 
 ## `external_identity_policy`

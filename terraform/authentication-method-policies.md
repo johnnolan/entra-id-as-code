@@ -2,7 +2,7 @@
 
 This guide explains each resource in [terraform/authentication-method-policies.tf](authentication-method-policies.tf). Each resource configures one authentication method in the Microsoft Entra ID Authentication Methods Policy (the tenant-wide policy that controls which sign-in and MFA (multi-factor authentication) methods users can register and use).
 
-> **Security note:** The Authentication Methods Policy only controls which methods are *available*. It does not enforce *when* a method must be used. Conditional Access enforces that — see [conditional-access.tf](conditional-access.tf), specifically `ca_2055_grant_phishing_resistant_mfa_admins`, which requires phishing-resistant MFA (methods that can't be intercepted or replayed by an attacker, such as FIDO2 or certificate-based authentication) for admin and Office 365 access.
+> **Security note:** The Authentication Methods Policy only controls which methods are *available*. It does not enforce *when* a method must be used. Conditional Access enforces that — see [conditional-access.tf](conditional-access.tf), specifically `ca_2055_grant_phishing_resistant_mfa_admins` (scoped to the CISA highly-privileged directory roles, all apps) and `ca_2060_grant_phishing_resistant_mfa_all_users` (all users, all apps), which require phishing-resistant MFA (methods that can't be intercepted or replayed by an attacker, such as FIDO2 or certificate-based authentication).
 
 ## Microsoft Graph Application Permissions
 

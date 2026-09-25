@@ -93,7 +93,7 @@ This backlog tracks issues identified during the Entra ID Terraform audit. Work 
   - Completion check: Every non-empty Terraform file has a same-name Markdown guide, and every citation is verified against a stable URL.
 
 - [x] **Correct the shared Maester and NCSC mapping**
-  - File: `.github/skills/terraform-security-baseline-auditor/references/maester-ncsc-mapping.md`
+  - File: `.github/skills/entra-security-audit/references/control-mapping.md`
   - Problem: Several existing rows use test IDs or names that do not match the current local index. The live `MT.1057` page currently describes application secrets rather than group expiration.
   - Fix: Reverify every existing row against the stable Maester test page and remove or correct stale mappings. Verify NCSC URLs before citing them.
   - Completion check: Every mapping row has a current stable Maester URL, an accurate test title, and a verified Microsoft or NCSC alignment.

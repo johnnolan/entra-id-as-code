@@ -1,6 +1,6 @@
 # Security groups
 
-This guide covers the Azure AD security group resources in [terraform/security-groups.tf](terraform/security-groups.tf):
+This guide covers the Azure AD security group resources in [terraform/security-groups.tf](security-groups.tf):
 
 - `azuread_group.cap_excluded_from_conditional_access`
 - `azuread_group.sec_guest_users`
@@ -37,12 +37,12 @@ terraform import azuread_group.ap_example_users <GROUP_OBJECT_ID>
 
 ## Terraform behavior in this repository
 
-In [terraform/security-groups.tf](terraform/security-groups.tf):
+In [terraform/security-groups.tf](security-groups.tf):
 
 - These are AzureAD typed resources because the AzureAD provider supports security groups directly.
 - They are ideal for Microsoft Entra group objects that need consistent Terraform lifecycle management.
-- The Graph-based settings and lifecycle policies are intentionally kept in [terraform/group-settings.tf](terraform/group-settings.tf) because they are not AzureAD group resources.
+- The Graph-based settings and lifecycle policies are intentionally kept in [terraform/group-settings.tf](group-settings.tf) because they are not AzureAD group resources.
 
 ## Related file
 
-- [terraform/group-settings.md](terraform/group-settings.md) covers the tenant-wide group lifecycle and Group.Unified settings policy objects.
+- [terraform/group-settings.md](group-settings.md) covers the tenant-wide group lifecycle and Group.Unified settings policy objects.

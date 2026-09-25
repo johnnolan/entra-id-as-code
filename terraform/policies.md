@@ -2,7 +2,7 @@
 
 This guide explains each resource in [terraform/policies.tf](policies.tf). These resources manage the tenant-wide Microsoft Entra ID policies that control sign-up flows, authorization defaults, external identity behavior, and whether Security Defaults or the Conditional Access baseline governs sign-in security.
 
-The repository uses typed AzureAD resources where available. The tenant-wide policy endpoints in this file remain `msgraph_resource` because AzureAD has no equivalent resources. `azuread_authentication_strength_policy.default_mfa` uses the AzureAD provider.
+The repository uses typed AzureAD resources where available. The tenant-wide policy endpoints in this file remain `msgraph_resource` because AzureAD has no equivalent resources. The `default_mfa`, `passwordless_mfa`, and `phishing_resistant_mfa` authentication strengths use the AzureAD provider.
 
 ## `authentication_flow_policy`
 
@@ -23,7 +23,7 @@ Configures the tenant's authorization policy (`policies/authorizationPolicy`) �
   - `allowedToCreateApps = false`, `allowedToCreateSecurityGroups = false`, `allowedToCreateTenants = false` — non-admins can't create apps, security groups, or new tenants.
   - `allowedToReadBitlockerKeysForOwnedDevice = false` — users can't self-service read their own device's BitLocker recovery key; recovery goes through the help desk.
   - `allowedToReadOtherUsers = false` — restricts the directory-wide read of other users' profiles.
-  - `permissionGrantPoliciesAssigned` — set to an empty list, which Microsoft Graph treats as fully disabling user consent to applications (including owned-resource consent for Teams/chat dynamically-managed permissions). Required for CISA.MS.AAD.5.2 ("Do not allow user consent") and blocks user consent grant attacks (Maester MT.1006). Admins must grant Teams/chat app permissions on users' behalf if needed.
+  - `permissionGrantPoliciesAssigned` — set to an empty list, which Microsoft Graph treats as fully disabling user consent to applications (including owned-resource consent for Teams/chat dynamically-managed permissions). Required for CISA.MS.AAD.5.2 ("Do not allow user consent") and restricts user consent. MT.1006 checks administrator MFA, not application consent. Admins must grant Teams/chat app permissions on users' behalf if needed.
 - `guestUserRoleId` — set to the built-in **Restricted Guest User** role template ID, so guests get the most limited directory visibility by default.
 
 ## `external_identity_policy`
@@ -59,9 +59,21 @@ Creates the `azuread_authentication_strength_policy.default_mfa` authentication 
 - `allowed_combinations` permits the approved FIDO2 and authenticator-based combinations used by Conditional Access policies.
 - The resource uses AzureAD because the provider exposes a typed authentication strength policy resource.
 
+## `passwordless_mfa`
+
+Creates a custom authentication strength allowing `fido2` and `windowsHelloForBusiness`. Conditional Access policies reference its managed resource ID.
+
+## `phishing_resistant_mfa`
+
+Creates a custom authentication strength allowing `fido2` and `windowsHelloForBusiness`. It is separate from the passwordless strength so policy intent remains explicit.
+
 ## Secrets and imports
 
-Every resource above targets a Microsoft Entra tenant singleton and has a matching `import` block mapping it to its fixed Microsoft Graph path. These let Terraform adopt the existing tenant configuration on first `terraform apply` instead of trying to create a resource that already exists.
+The authentication flows, authorization, external identities, and Security Defaults policies have import blocks for their existing tenant objects.
+Their configured collection URLs differ from the full object import identifiers. Beta imports include `?api-version=beta`.
+
+The B2B management policy is conditionally created. Adopt an existing organization-default policy deliberately before managing it here.
+The three custom authentication strengths are created resources; this file does not give them singleton import blocks.
 
 ## Resources
 

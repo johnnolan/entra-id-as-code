@@ -110,11 +110,14 @@ Use the draft to discuss permissions, blast radius, and rollback strategy before
 Keep shared expectations and file-to-skill routing in [AGENTS.md](AGENTS.md).
 Keep domain procedures in the linked skills and resource rationale in companion guides. Update these together when behavior changes.
 
+Run `python scripts/validate-agent-guidance.py` (requires Python and PyYAML) for local structure, links, discovery-link resolution, and backup integrity.
+See [skill validation scenarios](docs/agent-guidance/skill-validation.md) for expected behavior. These checks do not prove fresh-client discovery.
+
 To check discovery after changing guidance:
 
 1. Start a fresh session in each supported agent client at the repository root.
 2. Ask: "Without editing files, list the repository instruction files you loaded and identify the guidance for reviewing Conditional Access."
-3. Check that it identifies `AGENTS.md`, the Conditional Access skill, and the companion guide.
+3. Check that it identifies `AGENTS.md`, `entra-conditional-access`, local conventions, and the companion guide.
 4. Ask for a review and check that it reports findings without making unrequested edits.
 5. If automatic discovery fails, explicitly provide `AGENTS.md` and confirm that the agent follows its links.
 

@@ -21,7 +21,7 @@ The `azurerm` backend stores Terraform state in Azure Blob Storage.
 
 ### `azuread`
 
-The HashiCorp AzureAD provider is pinned to `~> 3.0`.
+The HashiCorp AzureAD provider is constrained to `~> 3.0`.
 
 - Use typed `azuread_*` resources whenever the provider supports the required Entra object and properties.
 - `tenant_id` and `client_id` select the workload identity used by Terraform.
@@ -29,7 +29,7 @@ The HashiCorp AzureAD provider is pinned to `~> 3.0`.
 
 ### `msgraph`
 
-The Microsoft Graph provider is pinned to `~> 0.4`.
+The Microsoft Graph provider is constrained to `~> 0.5`.
 
 - Use `msgraph_resource` only for Graph APIs without an AzureAD resource or required typed field.
 - It uses the same tenant, client, and OIDC workload identity as AzureAD.

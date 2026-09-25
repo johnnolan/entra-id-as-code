@@ -1,0 +1,4 @@
+interface:
+  display_name: "Entra Terraform"
+  short_description: "Build and troubleshoot Entra identity infrastructure"
+  default_prompt: "Use $entra-terraform to review the Entra Terraform configuration and explain permissions and adoption risks without editing files."

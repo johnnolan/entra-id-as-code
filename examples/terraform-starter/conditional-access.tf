@@ -6,7 +6,7 @@ resource "azuread_conditional_access_policy" "ca_1050_block_high_risk_countries"
     azuread_named_location.named_location_restricted_signin,
   ]
   display_name = "GLOBAL - 1050 - BLOCK - High-Risk Countries"
-  state        = "enabled"
+  state        = "enabledForReportingButNotEnforced"
 
   conditions {
     client_app_types = ["all"]

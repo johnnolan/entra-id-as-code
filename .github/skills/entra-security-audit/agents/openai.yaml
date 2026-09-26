@@ -1,0 +1,4 @@
+interface:
+  display_name: "Entra Security Audit"
+  short_description: "Audit Entra controls against verified security evidence"
+  default_prompt: "Use $entra-security-audit to assess the requested Entra configuration and report evidence-backed findings without editing files."

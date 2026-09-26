@@ -1,0 +1,20 @@
+{
+  "terraform-access-packages-permissions/SKILL.reference.md": "b608d58f4a07e99c766cb643d885a82fe69eba074c13fa141810b3b95ea21f27",
+  "terraform-authentication-method-policies-permissions/SKILL.reference.md": "4d832998b88d45b3faccb992200d06dbc208590b1a95029d852ab92cc37dbe61",
+  "terraform-conditional-access-architect/SKILL.reference.md": "623673cbee3b285f2fc474589bbd54fcfa9e9d3cb00254d811c1b5bf0b16e8e5",
+  "terraform-conditional-access-architect/references/maester-ncsc-mapping.md": "ed1aefa59d1dbdd10d7312e46d9656b4a9590066a92c7f2f273c5f19c3a51106",
+  "terraform-cross-tenant-access-permissions/SKILL.reference.md": "06aab81307a906f7708c04b7c9361bda3d43e5d51f2040fd436653d884f5d6ff",
+  "terraform-group-settings-permissions/SKILL.reference.md": "251324db787b1253e28eedcc5514bfd4177932e52f96af62a714f42ca19c795d",
+  "terraform-main-permissions/SKILL.reference.md": "2b0ba96f4a82eb536f870627cec403b0aaed3d822dbd2d17a77df132efbd5f12",
+  "terraform-named-locations-permissions/SKILL.reference.md": "506132be491321075783887eba21cab6be328f67bc1f3d4b2df151ad90d2c26b",
+  "terraform-outputs-permissions/SKILL.reference.md": "056f4807a2c2ff0716c4068d61f6a051f08911285bb3aef14b9524ba50b5a672",
+  "terraform-policies-permissions/SKILL.reference.md": "a080c40feb6dcca58e69574932de178dbc8113fbebab40dd9cba2aae73132ea4",
+  "terraform-security-baseline-auditor/SKILL.reference.md": "53bda00f6955933f20c795ab706fcca1bd2f1a27747fb753412abbd4feb086a6",
+  "terraform-security-baseline-auditor/references/eidsca-test-index.md": "e472d2cf949bb6dd5c432c3f652a8f3c9823009df1e58e18c938ef36b4588fdd",
+  "terraform-security-baseline-auditor/references/maester-ncsc-mapping.md": "8171b7a72bc6586b98e68c501846145eed6666bb408812b4a777b43aa3760942",
+  "terraform-security-baseline-auditor/references/maester-test-index.md": "0ad1a855197688f6fdccd7798dadc533edf93bce80c889053d642b5f6f5e6564",
+  "terraform-security-groups-permissions/SKILL.reference.md": "b145389aeb0f6da2a5a60e3061b02ece7065ba75d53cb392991f16e6f7e10183",
+  "terraform-service-principles-permissions/SKILL.reference.md": "0e2b55c360e37ebf3face7f1513e35df91ea4304ab0ba515134761970b121773",
+  "terraform-tenant-permissions/SKILL.reference.md": "dbd70ce9dc822271b4cb07cb1825d2f1df821f3232809dadb8324fbdac8322fb",
+  "terraform-variables-permissions/SKILL.reference.md": "21d5f221eec67251647c61e4ceffe113af94108fb9a327aa543daa60e766b045"
+}

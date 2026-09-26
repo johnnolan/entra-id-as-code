@@ -1,6 +1,6 @@
 # Group lifecycle and group settings
 
-This guide covers the Microsoft Graph resources in [terraform/group-settings.tf](terraform/group-settings.tf):
+This guide covers the Microsoft Graph resources in [terraform/group-settings.tf](group-settings.tf):
 
 - `msgraph_resource.group_lifecycle_policy`
 - `msgraph_resource.groups_settings`
@@ -47,7 +47,7 @@ Copy that object's `id` as `GROUPS_SETTINGS_ID`.
 
 ## Import commands
 
-Run these from the [terraform](terraform) folder only if the objects already exist:
+Run these from the [terraform](.) folder only if the objects already exist:
 
 ```bash
 terraform import msgraph_resource.group_lifecycle_policy groupLifecyclePolicies/<GROUP_LIFECYCLE_POLICY_ID>
@@ -56,7 +56,7 @@ terraform import msgraph_resource.groups_settings groupSettings/<GROUPS_SETTINGS
 
 ## Terraform behavior in this repository
 
-In [terraform/group-settings.tf](terraform/group-settings.tf):
+In [terraform/group-settings.tf](group-settings.tf):
 
 - Import blocks are intentionally not active for these resources.
 - The provider uses `msgraph_resource` because AzureAD has no equivalent typed resources for these Graph objects.
@@ -64,4 +64,4 @@ In [terraform/group-settings.tf](terraform/group-settings.tf):
 
 ## Related file
 
-- [terraform/security-groups.tf](terraform/security-groups.tf) contains Azure AD security group objects, not Graph group settings.
+- [terraform/security-groups.tf](security-groups.tf) contains Azure AD security group objects, not Graph group settings.

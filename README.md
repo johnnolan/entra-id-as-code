@@ -37,8 +37,8 @@ Terraform currently manages these Entra resources:
 - Authentication strength policy in `terraform/policies.tf`.
 - Named locations for Conditional Access in `terraform/named-locations.tf`.
 - Conditional Access baseline policies in `terraform/conditional-access.tf`.
-- Group lifecycle policy in `terraform/security-groups.tf`.
-- Group settings in `terraform/security-groups.tf`.
+- Group lifecycle policy in `terraform/group-settings.tf`.
+- Group settings in `terraform/group-settings.tf`.
 - Conditional Access exclusion group in `terraform/security-groups.tf`.
 - A Maester application registration and federated identity credential in `terraform/service-principles.tf`.
 
@@ -66,7 +66,8 @@ Use [AGENTS.md](AGENTS.md#find-domain-guidance) to find their guides and permiss
 - `terraform/policies.tf`: Core policy resources.
 - `terraform/named-locations.tf`: Named location resources for Conditional Access.
 - `terraform/conditional-access.tf`: Conditional Access baseline policies.
-- `terraform/security-groups.tf`: Group lifecycle, group settings, and exclusion group resources.
+- `terraform/security-groups.tf`: Security group objects.
+- `terraform/group-settings.tf`: Group lifecycle and tenant group settings.
 - `terraform/service-principles.tf`: Maester application registration and federated credential.
 
 ### Scripts
@@ -76,7 +77,7 @@ Use [AGENTS.md](AGENTS.md#find-domain-guidance) to find their guides and permiss
 
 ### Documentation
 
-- `terraform/security-groups.md`: Import and discovery guide for group settings and lifecycle objects.
+- `terraform/group-settings.md`: Import and discovery guide for group settings and lifecycle objects.
 - `docs/runbooks/setup-federated-credentials.md`: Entra and GitHub OIDC setup guide.
 - `docs/runbooks/storage-account-network-hardening.md`: Runbook for restricting Terraform state storage account network access and configuring dynamic runner IP allowlisting.
 
@@ -140,27 +141,10 @@ The exact permission set depends on the Terraform resources you manage. For this
 
 Use the repository skill files in `.github/skills` to verify the exact permission set before you run `apply`.
 
-Common Microsoft Graph application permissions for the current Terraform implementation include:
-
-- `Policy.Read.All`
-- `Policy.ReadWrite.ConditionalAccess`
-- `Policy.ReadWrite.AuthenticationFlows`
-- `Policy.ReadWrite.Authorization`
-- `Policy.ReadWrite.B2BManagementPolicy`
-- `Policy.ReadWrite.ExternalIdentities`
-- `Policy.ReadWrite.SecurityDefaults`
-- `Policy.ReadWrite.AuthenticationMethod`
-- `Policy.ReadWrite.CrossTenantAccess`
-- `Directory.ReadWrite.All`
-- `EntitlementManagement.ReadWrite.All`
-- `Group.ReadWrite.All`
-- `GroupSettings.ReadWrite.All`
-- `Organization.ReadWrite.All`
-- `Application.Read.All`
-
-> **Warning**
-> Conditional Access policies that use an `applications` condition require `Application.Read.All`.
-> Review the file-specific permission skill before you merge changes.
+Determine permissions from the operations performed by each resource and data source. Use the [operation-level permission reference](.github/skills/entra-terraform/references/permissions.md) and current provider/API documentation.
+Distinguish read/refresh, writes, lookups, and consent grants; broader alternatives are not cumulative requirements.
+Terraform execution permissions, requested Maester permissions, and Azure storage RBAC are separate.
+An applications condition in Conditional Access alone does not establish an `Application.Read.All` requirement.
 
 ## Understand the Maester application permissions
 
@@ -191,14 +175,16 @@ Terraform creates the Maester application registration in `terraform/service-pri
 - `SecurityIdentitiesSensors.Read.All`
 - `ThreatHunting.Read.All`
 - `UserAuthenticationMethod.Read.All`
-- `User.ReadWrite` (delegated scope)
 
 Grant admin consent after you create or update these permissions.
 
 ## Work with repository guidance
 
 Start with [AGENTS.md](AGENTS.md) for shared engineering expectations and the maintained file-to-skill mapping.
-The task-focused skills in `.github/skills/` support evidence-based reviews, permission checks, implementation, and technical writing.
+Three Entra skills in `.github/skills/` cover [Terraform engineering](.github/skills/entra-terraform/SKILL.md), [Conditional Access](.github/skills/entra-conditional-access/SKILL.md), and [security audits](.github/skills/entra-security-audit/SKILL.md).
+Domain references load only when needed. `.agents/skills` links to the canonical directory for Codex discovery.
+The technical-writing and blog-writing skills remain available.
+[Original and corrected backups](docs/skill-backups/2026-09-21/README.md) preserve the former skills for future expansion.
 Agents can read these files directly when their client does not discover them automatically.
 
 [CONTRIBUTING.md](CONTRIBUTING.md) explains how to validate changes and verify guidance discovery.
@@ -231,9 +217,9 @@ terraform plan -input=false -no-color
 
 ## Troubleshoot common issues
 
-- `403 AccessDenied` on Conditional Access resources: add `Application.Read.All` and grant admin consent.
+- `403 AccessDenied` on Conditional Access resources: identify the failing operation and verify resource and lookup permissions before adding grants.
 - Invalid authentication strength ID: confirm the built-in IDs or query `/policies/authenticationStrengthPolicies`.
-- Group settings or lifecycle import issues: follow `terraform/security-groups.md`.
+- Group settings or lifecycle import issues: follow `terraform/group-settings.md`.
 - OIDC federation failures: follow `docs/runbooks/setup-federated-credentials.md` and verify issuer, audience, and subject values.
 - Drift issue noise: review the scheduled plan output in the workflow run and the `terraform-drift` issue comments.
 

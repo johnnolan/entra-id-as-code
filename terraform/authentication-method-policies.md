@@ -48,7 +48,7 @@ Disables SMS as an authentication method (`state = "disabled"`, empty `includeTa
 Enables FIDO2 security keys and passkeys — a phishing-resistant method.
 
 - `state = "enabled"` and `isSelfServiceRegistrationAllowed = true` — all users can self-register a key without admin help.
-- `isAttestationEnforced = true` — requires the security key to prove (via manufacturer attestation) that it's a genuine, trusted device before registration succeeds.
+- `isAttestationEnforced = false` — attestation enforcement is disabled. The code records that enforcing it blocked registered Microsoft Authenticator passkeys from being offered at sign-in.
 - `keyRestrictions.isEnforced = true` with `enforcementType = "allow"` — allows registration only for security keys whose Authenticator Attestation GUID (AAGUID), an identifier for the authenticator make and model, is approved.
 - `aaGuids` allows the configured YubiKey Bio FIDO Edition models. Microsoft Graph requires at least one AAGUID when key restrictions are enforced.
 
@@ -94,7 +94,7 @@ Disables QR code + PIN sign-in (a frontline-worker-oriented method for shared de
 
 ## Secrets and imports
 
-Every resource above has a matching `import` block that maps it to its fixed Microsoft Graph path under `policies/authenticationMethodsPolicy/authenticationMethodConfigurations/`. These blocks let Terraform adopt the existing tenant configuration on first `terraform apply`, instead of trying to create a resource that already exists.
+Every resource above has a matching `import` block. The root imports `policies/authenticationMethodsPolicy`; individual methods import their fixed paths under `policies/authenticationMethodsPolicy/authenticationMethodConfigurations/`. These blocks let Terraform adopt the existing tenant configuration on first `terraform apply`, instead of trying to create a resource that already exists.
 
 ## Resources
 
@@ -111,13 +111,13 @@ Every resource above has a matching `import` block that maps it to its fixed Mic
 - [EIDSCA.AS04 — Authentication Method - SMS - Use for sign-in](https://maester.dev/docs/tests/EIDSCA.AS04) — confirms `auth_method_policy_sms.state` stays `disabled`.
 - [EIDSCA.AV01 — Authentication Method - Voice call - State](https://maester.dev/docs/tests/EIDSCA.AV01) — confirms `auth_method_policy_voice.state` stays `disabled`.
 - [EIDSCA.AF01 — Authentication Method - FIDO2 security key - State](https://maester.dev/docs/tests/EIDSCA.AF01) — confirms `auth_method_policy_fido2.state` stays `enabled`.
-- [EIDSCA.AF03 — Authentication Method - FIDO2 security key - Enforce attestation](https://maester.dev/docs/tests/EIDSCA.AF03) — confirms `isAttestationEnforced = true`.
+- [EIDSCA.AF03 — Authentication Method - FIDO2 security key - Enforce attestation](https://maester.dev/docs/tests/EIDSCA.AF03) — evaluates attestation enforcement. The current `false` value is a documented deviation; this guide does not claim a passing test.
 - [EIDSCA.AT01 — Authentication Method - Temporary Access Pass - State](https://maester.dev/docs/tests/EIDSCA.AT01) — confirms `auth_method_policy_temporary_access_pass.state` stays `enabled`.
 - [EIDSCA.AT02 — Authentication Method - Temporary Access Pass - One-time](https://maester.dev/docs/tests/EIDSCA.AT02) — confirms `isUsableOnce = true`.
 - [EIDSCA.AM01 — Authentication Method - Microsoft Authenticator - State](https://maester.dev/docs/tests/EIDSCA.AM01) — confirms `auth_method_policy_authenticator.state` stays `enabled`.
 - [EIDSCA.AM09 — Authentication Method - Microsoft Authenticator - Show geographic location](https://maester.dev/docs/tests/EIDSCA.AM09) — confirms `displayLocationInformationRequiredState = "enabled"`.
 - [CISA.MS.AAD.3.3 — Microsoft Authenticator login context](https://maester.dev/docs/tests/CISA.MS.AAD.3.3) — confirms Authenticator is enabled for all users, software OATH is disabled, and application and location context are enabled for all users.
-- [CISA.MS.AAD.3.5 — SMS, Voice Call, and Email OTP SHALL be disabled](https://maester.dev/docs/tests/CISA.MS.AAD.3.5) — covers `auth_method_policy_sms` and `auth_method_policy_voice`; note this tenant keeps Email OTP enabled but scoped to guests only, which is a deliberate deviation documented above.
+- [CISA.MS.AAD.3.5 — SMS, Voice Call, and Email OTP SHALL be disabled](https://maester.dev/docs/tests/CISA.MS.AAD.3.5) — covers `auth_method_policy_sms` and `auth_method_policy_voice`; Email OTP is also disabled in the current configuration.
 - [CISA.MS.AAD.3.6 — Phishing-resistant MFA SHALL be required for highly privileged roles](https://maester.dev/docs/tests/CISA.MS.AAD.3.6) — validated at the Conditional Access layer, not here; see `ca_2055_grant_phishing_resistant_mfa_admins` in [conditional-access.tf](conditional-access.tf).
 - [MT.1067 — Authentication methods policies should not reference deleted groups](https://maester.dev/docs/tests/MT.1067) — relevant because `auth_method_policy_email` targets the `sec_guest_users` group; deleting that group without updating the policy would fail this test.
 - [CISA.MS.AAD.3.4 — The Authentication Methods Manage Migration feature SHALL be set to Migration Complete](https://maester.dev/docs/tests/CISA.MS.AAD.3.4) — confirms `auth_method_policy_root.policyMigrationState` stays `migrationComplete`.

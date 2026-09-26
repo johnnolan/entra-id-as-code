@@ -1,0 +1,4 @@
+interface:
+  display_name: "Entra Conditional Access"
+  short_description: "Design and review safe Conditional Access changes"
+  default_prompt: "Use $entra-conditional-access to review policy targeting, emergency access, and rollout readiness without editing files."

@@ -8,7 +8,9 @@ Help contributors understand significant choices, supporting evidence, and expec
 - Read [README.md](README.md) for architecture and [CONTRIBUTING.md](CONTRIBUTING.md) for validation and review expectations.
 - Read the target file and its companion `.md` guide before changing behavior. Workflow guides sit beside their YAML files.
 - Use the table below to read the relevant domain skill. Load its references only when needed for the task.
-- Skills remain in `.github/skills/`. If your tool does not discover them automatically, open the linked `SKILL.md` directly.
+- Canonical skills live in `.github/skills/`; `.agents/skills` links there for Codex discovery. If automatic discovery fails, open the linked `SKILL.md` directly.
+- For local names, dependencies, and observed provider versions, read [Entra repository conventions](docs/agent-guidance/entra-repository.md).
+- Historical skills under `docs/skill-backups/` are reference material, not active instructions.
 - For an unmapped file, inspect related resources and guidance; do not invent a matching skill or assume the file is unmanaged.
 
 ## Follow the requested scope
@@ -30,25 +32,21 @@ Help contributors understand significant choices, supporting evidence, and expec
 
 ## Find domain guidance
 
-| Terraform File | Skill |
+| Task or Terraform area | Skill and relevant reference |
 |---|---|
-| `terraform/conditional-access.tf` | [terraform-conditional-access-architect](.github/skills/terraform-conditional-access-architect/SKILL.md) |
-| `terraform/group-settings.tf` | [terraform-group-settings-permissions](.github/skills/terraform-group-settings-permissions/SKILL.md) |
-| `terraform/main.tf` | [terraform-main-permissions](.github/skills/terraform-main-permissions/SKILL.md) |
-| `terraform/named-locations.tf` | [terraform-named-locations-permissions](.github/skills/terraform-named-locations-permissions/SKILL.md) |
-| `terraform/outputs.tf` | [terraform-outputs-permissions](.github/skills/terraform-outputs-permissions/SKILL.md) |
-| `terraform/policies.tf` | [terraform-policies-permissions](.github/skills/terraform-policies-permissions/SKILL.md) |
-| `terraform/security-groups.tf` | [terraform-security-groups-permissions](.github/skills/terraform-security-groups-permissions/SKILL.md) |
-| `terraform/service-principles.tf` | [terraform-service-principles-permissions](.github/skills/terraform-service-principles-permissions/SKILL.md) |
-| `terraform/tenant.tf` | [terraform-tenant-permissions](.github/skills/terraform-tenant-permissions/SKILL.md) |
-| `terraform/variables.tf` | [terraform-variables-permissions](.github/skills/terraform-variables-permissions/SKILL.md) |
-| `terraform/access-packages.tf` | [terraform-access-packages-permissions](.github/skills/terraform-access-packages-permissions/SKILL.md) |
-| `terraform/authentication-method-policies.tf` | [terraform-authentication-method-policies-permissions](.github/skills/terraform-authentication-method-policies-permissions/SKILL.md) |
-| `terraform/cross-tenant-access.tf` | [terraform-cross-tenant-access-permissions](.github/skills/terraform-cross-tenant-access-permissions/SKILL.md) |
+| Conditional Access, including related exclusions and location changes | [entra-conditional-access](.github/skills/entra-conditional-access/SKILL.md) and [local conventions](docs/agent-guidance/entra-repository.md) |
+| Providers, backend, variables, outputs, or an unmapped Entra resource | [entra-terraform](.github/skills/entra-terraform/SKILL.md) |
+| Group settings, security groups, access packages | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [groups and governance](.github/skills/entra-terraform/references/groups-and-governance.md) |
+| Authentication method policies | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [authentication methods](.github/skills/entra-terraform/references/authentication-methods.md) |
+| Cross-tenant access | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [cross-tenant access](.github/skills/entra-terraform/references/cross-tenant-access.md) |
+| Applications and service principals | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [applications](.github/skills/entra-terraform/references/applications.md) |
+| Tenant details, policies, authentication strengths | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [tenant policies](.github/skills/entra-terraform/references/tenant-policies.md) |
+| Permission diagnosis, including named locations | [entra-terraform](.github/skills/entra-terraform/SKILL.md), then [permissions](.github/skills/entra-terraform/references/permissions.md) |
+| Requested security audit, baseline alignment, or evidence-backed resource guide | [entra-security-audit](.github/skills/entra-security-audit/SKILL.md) |
 
+Route by the requested workflow and actual resources, not filename alone. Load only references relevant to the task.
 
 - For technical documentation, use [gds-tech-writer](.github/skills/gds-tech-writer/SKILL.md).
-- For requested security audits or baseline alignment, use [terraform-security-baseline-auditor](.github/skills/terraform-security-baseline-auditor/SKILL.md).
 - For requested blog writing, use [johnnolan-blog-writer](.github/skills/johnnolan-blog-writer/SKILL.md).
 - For federation or state networking, read the [setup](docs/runbooks/setup-federated-credentials.md) or [network runbook](docs/runbooks/storage-account-network-hardening.md).
 

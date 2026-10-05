@@ -12,7 +12,7 @@ terraform {
     }
     msgraph = {
       source  = "microsoft/msgraph"
-      version = "~> 0.5"
+      version = "~> 0.6"
     }
   }
 }
